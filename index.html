@@ -124,6 +124,68 @@
   .search-input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(28,28,48,0.09); }
   .search-input::placeholder { color: var(--text-faint); }
   @media print { body { background: white; } .left-panel, .toast, .save-fab { display: none !important; } .right-panel { padding: 1rem; } .workspace { display: block; } }
+/* ── RESPONSIVE PADA IPAD & TABLET (Layar < 1024px) ── */
+  @media screen and (max-width: 1024px) {
+    .workspace {
+      display: block; /* Matikan flex, jadikan atas-bawah */
+    }
+    .left-panel {
+      width: 100%;
+      min-width: 100%;
+      height: auto;
+      position: relative; /* Matikan efek sticky */
+      overflow-y: visible;
+      border-right: none;
+      border-bottom: 1px solid var(--border-strong);
+      padding: 1.5rem;
+    }
+    .right-panel {
+      width: 100%;
+      min-height: auto;
+      padding: 1.5rem;
+    }
+    .product-grid {
+      /* Tombol produk di iPad jadikan 3 kolom agar rapi */
+      grid-template-columns: repeat(3, 1fr); 
+    }
+  }
+
+  /* ── RESPONSIVE KHUSUS MOBILE / HP (Layar < 600px) ── */
+  @media screen and (max-width: 600px) {
+    .masthead {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 1rem;
+    }
+    .save-fab {
+      width: 100%;
+      text-align: center;
+    }
+    .product-grid {
+      /* Kembalikan ke 2 kolom di layar kecil HP */
+      grid-template-columns: 1fr 1fr; 
+    }
+    .detail-header, .detail-item {
+      /* Paksa agar detail pesanan tidak hancur, munculkan scroll horizontal */
+      min-width: 580px; 
+    }
+    .order-footer-strip {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 16px;
+    }
+    .order-footer-actions {
+      width: 100%;
+      justify-content: flex-end;
+      border-top: 1px solid var(--border);
+      padding-top: 10px;
+    }
+    .modal {
+      width: 100%;
+      margin: 10px;
+      padding: 20px 16px;
+    }
+  }
 </style>
 </head>
 <body>

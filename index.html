@@ -162,6 +162,7 @@
   .filter-bar { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 0.75rem; align-items: center; }
   .filter-label { font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--text-faint); font-family: 'Helvetica Neue', sans-serif; white-space: nowrap; }
   .sort-btn { height: 38px; padding: 0 14px; border-radius: 8px; border: 1.5px solid var(--border-strong); background: var(--surface); font-family: 'Helvetica Neue', sans-serif; font-size: 12px; color: var(--text-muted); cursor: pointer; transition: all 0.15s; white-space: nowrap; display: inline-flex; align-items: center; gap: 5px; }
+  .sort-btn.active { background: var(--accent); border-color: var(--accent); color: #fff; }
   .sort-btn.active-asc  { background: var(--accent); border-color: var(--accent); color: #fff; }
   .sort-btn.active-desc { background: #1a8a4a; border-color: #1a8a4a; color: #fff; }
   .filter-divider { width: 1px; height: 28px; background: var(--border-strong); flex-shrink: 0; }
@@ -279,22 +280,31 @@
       </div>
       <div class="filter-bar">
         <span class="filter-label">Sort by</span>
-        <button class="sort-btn active-desc" id="sort-toggle" onclick="toggleSort()" title="Toggle sort order">Newest First</button>
+        <button class="sort-btn active" data-sort="default" id="sort-toggle" onclick="toggleSort()" title="Toggle sort order">Newest First</button>
         <div class="filter-divider"></div>
         <span class="filter-label">Due Date</span>
-        <button class="sort-btn" id="sort-due-toggle" onclick="toggleDueSort()" title="Toggle due date sort">↑ Earliest</button>
+        <button class="sort-btn" data-sort="due-asc" id="sort-due-toggle" onclick="toggleDueSort()" title="Toggle due date sort">↑ Earliest</button>
         <div class="filter-divider"></div>
         <span class="filter-label">Fitting Date</span>
-        <button class="sort-btn" id="sort-fit-toggle" onclick="toggleFitSort()" title="Toggle fitting date sort">↑ Earliest</button>
+        <button class="sort-btn" data-sort="fit-asc" id="sort-fit-toggle" onclick="toggleFitSort()" title="Toggle fitting date sort">↑ Earliest</button>
+      </div>
+      <div class="filter-bar" style="margin-bottom:0.5rem">
+        <span class="filter-label">Products</span>
+        <button class="sort-btn product-filter-btn" data-product="Jacket" onclick="toggleProductFilter('Jacket')">Jacket</button>
+        <button class="sort-btn product-filter-btn" data-product="Trousers" onclick="toggleProductFilter('Trousers')">Trousers</button>
+        <button class="sort-btn product-filter-btn" data-product="Shirt" onclick="toggleProductFilter('Shirt')">Shirt</button>
+        <button class="sort-btn product-filter-btn" data-product="Vest" onclick="toggleProductFilter('Vest')">Vest</button>
+        <button class="sort-btn product-filter-btn" data-product="Safari Jacket" onclick="toggleProductFilter('Safari Jacket')">Safari Jacket</button>
+        <button class="sort-btn product-filter-btn" data-product="Overcoat" onclick="toggleProductFilter('Overcoat')">Overcoat</button>
       </div>
       <div class="filter-bar" style="margin-bottom:1rem">
         <span class="filter-label">Filter</span>
-        <button class="sort-btn" id="filter-fabricordered" onclick="toggleStatusFilter('Fabric Ordered')">Fabric Ordered</button>
-        <button class="sort-btn" id="filter-bin" onclick="toggleStatusFilter('Bin')">Bin</button>
-        <button class="sort-btn" id="filter-delta" onclick="toggleStatusFilter('Delta')">Delta</button>
-        <button class="sort-btn" id="filter-batam" onclick="toggleStatusFilter('Batam')">Batam</button>
-        <button class="sort-btn" id="filter-instore" onclick="toggleStatusFilter('In-store')">In-Store</button>
-        <button class="sort-btn" id="filter-takehome" onclick="toggleStatusFilter('Take Home')">Take Home</button>
+        <button class="sort-btn status-filter-btn" data-status="Fabric Ordered" id="filter-fabricordered" onclick="toggleStatusFilter('Fabric Ordered')">Fabric Ordered</button>
+        <button class="sort-btn status-filter-btn" data-status="Bin" id="filter-bin" onclick="toggleStatusFilter('Bin')">Bin</button>
+        <button class="sort-btn status-filter-btn" data-status="Delta" id="filter-delta" onclick="toggleStatusFilter('Delta')">Delta</button>
+        <button class="sort-btn status-filter-btn" data-status="Batam" id="filter-batam" onclick="toggleStatusFilter('Batam')">Batam</button>
+        <button class="sort-btn status-filter-btn" data-status="In-store" id="filter-instore" onclick="toggleStatusFilter('In-store')">In-Store</button>
+        <button class="sort-btn status-filter-btn" data-status="Take Home" id="filter-takehome" onclick="toggleStatusFilter('Take Home')">Take Home</button>
         <div class="filter-divider"></div>
         <button class="sort-btn" id="filter-stuck" onclick="toggleStuckFilter()">Stuck</button>
         <button class="sort-btn" id="filter-unpaid" onclick="toggleUnpaidFilter()">Unpaid</button>
@@ -310,13 +320,13 @@
       </div>
       <div class="filter-bar">
         <span class="filter-label">Sort by</span>
-        <button class="sort-btn active-asc" id="arc-sort-toggle" onclick="toggleArchiveSort()">Oldest First</button>
+        <button class="sort-btn archive-sort-btn active" data-archive-sort="default" id="arc-sort-toggle" onclick="toggleArchiveSort()">Oldest First</button>
         <div class="filter-divider"></div>
         <span class="filter-label">Due Date</span>
-        <button class="sort-btn" id="arc-sort-due-toggle" onclick="toggleArchiveDueSort()">↑ Earliest</button>
+        <button class="sort-btn archive-sort-btn" data-archive-sort="due-asc" id="arc-sort-due-toggle" onclick="toggleArchiveDueSort()">↑ Earliest</button>
         <div class="filter-divider"></div>
         <span class="filter-label">Fitting Date</span>
-        <button class="sort-btn" id="arc-sort-fit-toggle" onclick="toggleArchiveFitSort()">↑ Earliest</button>
+        <button class="sort-btn archive-sort-btn" data-archive-sort="fit-asc" id="arc-sort-fit-toggle" onclick="toggleArchiveFitSort()">↑ Earliest</button>
       </div>
       <div id="archive-content"></div>
     </div>
@@ -386,7 +396,10 @@
   const API_URL = 'https://script.google.com/macros/s/AKfycbxi5HqcfmXs2FUdt9WcrSFjSUXNAeylfdU1YUH1KUoLIxxPLuv0PGkC6hQiHq2V0g_J/exec'; 
 
   async function syncToServer(orderData, isDelete = false) {
-    showToast(isDelete ? 'Deleting on server...' : 'Syncing to server...');
+    showToast(isDelete ? 'Deleting...' : 'Saving...');
+    // Save to localStorage first (offline support)
+    saveToLocalStorage();
+    
     try {
       const payload = isDelete ? { action: 'DELETE', orderNum: orderData.orderNum } : orderData;
       const response = await fetch(API_URL, {
@@ -396,10 +409,14 @@
       });
       const result = await response.json();
       if(result.status === 'success') {
-        showToast(isDelete ? '✓ Deleted online' : '✓ Saved online');
+        showToast(isDelete ? '✓ Deleted' : '✓ Saved');
+      } else {
+        showToast('⚠️ Local save only (API error)');
       }
     } catch (error) {
-      showToast('Network error, retrying...');
+      console.error('Sync error:', error);
+      showToast('✓ Saved locally (offline)');
+      // Data sudah tersimpan di localStorage
     }
   }
 
@@ -425,14 +442,64 @@
         else renderArchive();
         
         if (btn) btn.textContent = '🔄 Refresh';
+        showToast('✓ Data loaded');
+        saveToLocalStorage();
       }
     } catch (error) {
-      showToast('Failed to load data');
-      if (btn) btn.textContent = '🔄 Refresh';
+      console.error('Fetch error:', error);
+      showToast('⚠️ Failed to load - Check API URL or connection');
+      if (btn) btn.textContent = '❌ Sync Failed';
+      loadFromLocalStorage();
+    }
+  }
+  
+  function loadFromLocalStorage() {
+    try {
+      var saved = localStorage.getItem('sakal-orders');
+      if(saved) {
+        var data = JSON.parse(saved);
+        orders = data.orders || [];
+        archivedOrders = data.archived || [];
+        if (currentTab === 'orders') renderOrders();
+        else renderArchive();
+        showToast('📦 Loaded from cache (offline mode)');
+      } else {
+        if (currentTab === 'orders') renderOrders();
+        else renderArchive();
+      }
+    } catch (e) {
+      console.log('Cache error:', e);
+      if (currentTab === 'orders') renderOrders();
+      else renderArchive();
+    }
+  }
+  
+  function saveToLocalStorage() {
+    try {
+      var data = {
+        orders: orders,
+        archived: archivedOrders,
+        lastSaved: new Date().toISOString()
+      };
+      localStorage.setItem('sakal-orders', JSON.stringify(data));
+    } catch (e) {
+      console.log('Cannot save to localStorage');
     }
   }
 
-  window.onload = fetchOrdersFromServer;
+  window.onload = function() {
+    // Try fetch from API
+    fetchOrdersFromServer();
+    // But also load from cache in case API fails
+    setTimeout(function() {
+      if(orders.length === 0 && archivedOrders.length === 0) {
+        loadFromLocalStorage();
+      }
+      updateSortButtons();
+      updateArchiveSortButtons();
+      updateProductFilterButtons();
+    }, 500);
+  };
   window.addEventListener('focus', fetchOrdersFromServer);
 
   // ==========================================
@@ -456,10 +523,11 @@
   var orders = [];         // EMPTY (CLEAN SLATE)
   var archivedOrders = []; // EMPTY (CLEAN SLATE)
   
-  var currentSort = 'newest';
+  var currentSort = 'default';
   var activeStatusFilter = null;
   var activeStuckFilter  = false;
   var activeUnpaidFilter = false;
+  var activeProductFilters = {};
   var currentTab = 'orders';
   var currentArchiveSort = 'default';
 
@@ -816,7 +884,7 @@
   // RENDER & FILTER UI LOGIC
   // ==========================================
   function statusClass(s) { var map = { 'Batam':'on-batam','Delta':'on-delta','Fabric Ordered':'on-fabricordered','In-store':'on-instore','Take Home':'on-takehome','Bin':'on-bin' }; return map[s] || ''; }
-  function formatDisplayDate(iso) { var p=iso.split('-'); var m=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']; return p[2]+' '+m[parseInt(p[1],10)-1]+' '+p[0]; }
+  function formatDisplayDate(iso) { var p=iso.split('-'); var m=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']; return parseInt(p[2],10)+' '+m[parseInt(p[1],10)-1]+' '+p[0]; }
   function isDueSoon(iso) { if(!iso)return false; var d=new Date(iso); var n=new Date(); n.setHours(0,0,0,0); var diff=(d-n)/86400000; return diff>=0&&diff<=3; }
   function showToast(msg) { var t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show'); setTimeout(function(){ t.classList.remove('show'); }, 2600); }
   function esc(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
@@ -842,12 +910,26 @@
 
   function renderOrders() {
     var el = document.getElementById('orders-content'); var searchEl = document.getElementById('order-search'); var searchTerm = searchEl ? searchEl.value.trim().toLowerCase() : '';
+    var hasProductFilter = Object.keys(activeProductFilters).some(function(k) { return activeProductFilters[k]; });
+    
     var filtered = orders.map(function(o,i){return {order:o, origIdx:i};}).filter(function(e){
       var o = e.order; var items = o.items || [];
+      
+      // Check product filter
+      if(hasProductFilter) {
+        var hasMatchingProduct = items.some(function(it) {
+          return activeProductFilters[it.product];
+        });
+        if(!hasMatchingProduct) return false;
+      }
+      
+      // Check status/stuck/unpaid filters
       if(!searchTerm && !activeStatusFilter && !activeStuckFilter && !activeUnpaidFilter) return true;
       if(activeStatusFilter && !items.some(function(it){return it.status===activeStatusFilter;})) return false;
       if(activeStuckFilter && !items.some(function(it){return it.stuck;})) return false;
       if(activeUnpaidFilter && !items.some(function(it){return !it.paid;})) return false;
+      
+      // Check search
       if(!searchTerm) return true;
       if(o.orderNum.toLowerCase().indexOf(searchTerm)!==-1 || (o.remarks||'').toLowerCase().indexOf(searchTerm)!==-1) return true;
       return items.some(function(it){ return (it.fabric||'').toLowerCase().indexOf(searchTerm)!==-1 || (it.lining||'').toLowerCase().indexOf(searchTerm)!==-1; });
@@ -938,23 +1020,118 @@
   }
 
   // UI Setup & Sorting Toggles
-  function setSort(mode) { currentSort = mode; renderOrders(); }
-  function setArchiveSort(mode) { currentArchiveSort = mode; renderArchive(); }
+  function setSort(mode) { currentSort = mode; updateSortButtons(); renderOrders(); }
+  function setArchiveSort(mode) { currentArchiveSort = mode; updateArchiveSortButtons(); renderArchive(); }
   function toggleSort() { setSort(currentSort==='newest'?'default':'newest'); }
   function toggleDueSort() { setSort(currentSort==='due-asc'?'due-desc':'due-asc'); }
   function toggleFitSort() { setSort(currentSort==='fit-asc'?'fit-desc':'fit-asc'); }
   function toggleArchiveSort() { setArchiveSort(currentArchiveSort==='newest'?'default':'newest'); }
   function toggleArchiveDueSort() { setArchiveSort(currentArchiveSort==='due-asc'?'due-desc':'due-asc'); }
   function toggleArchiveFitSort() { setArchiveSort(currentArchiveSort==='fit-asc'?'fit-desc':'fit-asc'); }
+  
+  // Update visual highlighting for sort buttons
+  function updateSortButtons() {
+    document.querySelectorAll('[data-sort]').forEach(function(btn) {
+      btn.classList.remove('active');
+    });
+    var activeBtn = document.querySelector('[data-sort="'+currentSort+'"]');
+    if(activeBtn) activeBtn.classList.add('active');
+  }
+  
+  function updateArchiveSortButtons() {
+    document.querySelectorAll('[data-archive-sort]').forEach(function(btn) {
+      btn.classList.remove('active');
+    });
+    var activeBtn = document.querySelector('[data-archive-sort="'+currentArchiveSort+'"]');
+    if(activeBtn) activeBtn.classList.add('active');
+  }
+  
+  // Filter by product
+  function toggleProductFilter(product) {
+    activeProductFilters[product] = !activeProductFilters[product];
+    updateProductFilterButtons();
+    renderOrders();
+  }
+  
+  function updateProductFilterButtons() {
+    document.querySelectorAll('.product-filter-btn').forEach(function(btn) {
+      var prod = btn.getAttribute('data-product');
+      if(activeProductFilters[prod]) {
+        btn.classList.add('active');
+      } else {
+        btn.classList.remove('active');
+      }
+    });
+  }
+  
+  function clearProductFilters() {
+    activeProductFilters = {};
+    updateProductFilterButtons();
+    renderOrders();
+  }
 
   function toggleNoneDate(f) { var i=document.getElementById(f+'-input'), b=document.getElementById(f+'-none-btn'); if(i.value){i.value='';b.classList.add('none-btn-active');}else{b.classList.toggle('none-btn-active');} }
   document.getElementById('duedate-input').addEventListener('change', function(){if(this.value)document.getElementById('duedate-none-btn').classList.remove('none-btn-active');});
   document.getElementById('fittingdate-input').addEventListener('change', function(){if(this.value)document.getElementById('fittingdate-none-btn').classList.remove('none-btn-active');});
 
-  function toggleStatusFilter(status) { if(activeStatusFilter===status){clearStatusFilter();return;} activeStatusFilter=status; activeStuckFilter=false; activeUnpaidFilter=false; document.getElementById('filter-clear').style.display=''; renderOrders(); }
-  function toggleStuckFilter() { activeStuckFilter=!activeStuckFilter; activeStatusFilter=null; activeUnpaidFilter=false; document.getElementById('filter-clear').style.display=activeStuckFilter?'':'none'; renderOrders(); }
-  function toggleUnpaidFilter() { activeUnpaidFilter=!activeUnpaidFilter; activeStatusFilter=null; activeStuckFilter=false; document.getElementById('filter-clear').style.display=activeUnpaidFilter?'':'none'; renderOrders(); }
-  function clearStatusFilter() { activeStatusFilter=null; activeStuckFilter=false; activeUnpaidFilter=false; document.getElementById('filter-clear').style.display='none'; renderOrders(); }
+  function toggleStatusFilter(status) { 
+    if(activeStatusFilter===status){clearStatusFilter();return;} 
+    activeStatusFilter=status; activeStuckFilter=false; activeUnpaidFilter=false; 
+    document.getElementById('filter-clear').style.display='';
+    updateStatusFilterButtons();
+    renderOrders(); 
+  }
+  
+  function toggleStuckFilter() { 
+    activeStuckFilter=!activeStuckFilter; activeStatusFilter=null; activeUnpaidFilter=false; 
+    document.getElementById('filter-clear').style.display=activeStuckFilter?'':'none';
+    updateStuckFilterButton();
+    renderOrders(); 
+  }
+  
+  function toggleUnpaidFilter() { 
+    activeUnpaidFilter=!activeUnpaidFilter; activeStatusFilter=null; activeStuckFilter=false; 
+    document.getElementById('filter-clear').style.display=activeUnpaidFilter?'':'none';
+    updateUnpaidFilterButton();
+    renderOrders(); 
+  }
+  
+  function clearStatusFilter() { 
+    activeStatusFilter=null; activeStuckFilter=false; activeUnpaidFilter=false; 
+    document.getElementById('filter-clear').style.display='none';
+    updateStatusFilterButtons();
+    updateStuckFilterButton();
+    updateUnpaidFilterButton();
+    renderOrders(); 
+  }
+  
+  function updateStatusFilterButtons() {
+    document.querySelectorAll('.status-filter-btn').forEach(function(btn) {
+      btn.classList.remove('active');
+    });
+    if(activeStatusFilter) {
+      var activeBtn = document.querySelector('[data-status="'+activeStatusFilter+'"]');
+      if(activeBtn) activeBtn.classList.add('active');
+    }
+  }
+  
+  function updateStuckFilterButton() {
+    var btn = document.getElementById('filter-stuck');
+    if(activeStuckFilter) {
+      btn.classList.add('active');
+    } else {
+      btn.classList.remove('active');
+    }
+  }
+  
+  function updateUnpaidFilterButton() {
+    var btn = document.getElementById('filter-unpaid');
+    if(activeUnpaidFilter) {
+      btn.classList.add('active');
+    } else {
+      btn.classList.remove('active');
+    }
+  }
 
   // Set minimum dates on load
   (function(){ var t=new Date(); t.setDate(t.getDate()+1); var m = t.getFullYear()+'-'+String(t.getMonth()+1).padStart(2,'0')+'-'+String(t.getDate()).padStart(2,'0'); document.getElementById('duedate-input').min=m; document.getElementById('fittingdate-input').min=m; document.getElementById('modal-duedate').min=m; document.getElementById('modal-fittingdate').min=m; })();

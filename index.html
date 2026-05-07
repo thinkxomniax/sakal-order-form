@@ -167,9 +167,11 @@
   .sort-btn.active-desc { background: #1a8a4a; border-color: #1a8a4a; color: #fff; }
   .filter-divider { width: 1px; height: 28px; background: var(--border-strong); flex-shrink: 0; }
 
-  .search-wrap { margin-bottom: 1rem; }
-  .search-input { width: 100%; height: 44px; padding: 0 16px 0 40px; border: 1.5px solid var(--border-strong); border-radius: var(--radius-sm); font-family: 'Helvetica Neue', sans-serif; font-size: 14px; color: var(--text); background: var(--surface); outline: none; transition: border-color 0.15s, box-shadow 0.15s; -webkit-appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23aaa' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cline x1='21' y1='21' x2='16.65' y2='16.65'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: 12px center; }
+  .search-wrap { margin-bottom: 1rem; position: relative; }
+  .search-input { width: 100%; height: 44px; padding: 0 40px 0 40px; border: 1.5px solid var(--border-strong); border-radius: var(--radius-sm); font-family: 'Helvetica Neue', sans-serif; font-size: 14px; color: var(--text); background: var(--surface); outline: none; transition: border-color 0.15s, box-shadow 0.15s; -webkit-appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23aaa' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cline x1='21' y1='21' x2='16.65' y2='16.65'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: 12px center; }
   .search-input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(28,28,48,0.09); }
+  .search-clear-btn { position: absolute; right: 12px; top: 50%; transform: translateY(-50%); background: none; border: none; color: var(--text-muted); cursor: pointer; font-size: 16px; padding: 4px 8px; transition: color 0.15s; }
+  .search-clear-btn:hover { color: var(--text); }
   
   /* ── RESPONSIVE PADA IPAD & TABLET (Layar < 1024px) ── */
   @media screen and (max-width: 1024px) {
@@ -276,7 +278,8 @@
     <!-- Orders tab content -->
     <div id="pane-orders" style="">
       <div class="search-wrap">
-        <input class="search-input" type="text" id="order-search" placeholder="Search by order no., fabric, lining or remarks…" oninput="renderOrders()" autocomplete="off">
+        <input class="search-input" type="text" id="order-search" placeholder="Search by order no., fabric, lining or remarks…" oninput="renderOrders()" onkeypress="if(event.key==='Enter') renderOrders();" autocomplete="off">
+        <button class="search-clear-btn" id="search-clear" onclick="clearSearch()" style="display:none;">✕</button>
       </div>
       <div class="filter-bar">
         <span class="filter-label">Sort by</span>
@@ -917,6 +920,10 @@
 
   function renderOrders() {
     var el = document.getElementById('orders-content'); var searchEl = document.getElementById('order-search'); var searchTerm = searchEl ? searchEl.value.trim().toLowerCase() : '';
+    
+    // Show/hide search clear button
+    document.getElementById('search-clear').style.display = searchTerm ? 'block' : 'none';
+    
     var hasProductFilter = Object.keys(activeProductFilters).some(function(k) { return activeProductFilters[k]; });
     
     var filtered = orders.map(function(o,i){return {order:o, origIdx:i};}).filter(function(e){
@@ -951,8 +958,8 @@
       return true;
     });
 
-    if(currentSort==='default') filtered.sort(function(a,b){return b.origIdx-a.origIdx;});
-    else if(currentSort==='newest') filtered.sort(function(a,b){return a.origIdx-b.origIdx;});
+    if(currentSort==='default') filtered.sort(function(a,b){return new Date(b.order.date||0) - new Date(a.order.date||0);});
+    else if(currentSort==='newest') filtered.sort(function(a,b){return new Date(a.order.date||0) - new Date(b.order.date||0);});
     else if(currentSort==='due-asc') filtered.sort(function(a,b){return (a.order.dueDate||'9999').localeCompare(b.order.dueDate||'9999');});
     else if(currentSort==='due-desc') filtered.sort(function(a,b){return (b.order.dueDate||'9999').localeCompare(a.order.dueDate||'9999');});
     else if(currentSort==='fit-asc') filtered.sort(function(a,b){return (a.order.fittingDate||'9999').localeCompare(b.order.fittingDate||'9999');});
@@ -1000,8 +1007,8 @@
       return (o.items||[]).some(function(it){ return (it.fabric||'').toLowerCase().indexOf(searchTerm)!==-1 || (it.lining||'').toLowerCase().indexOf(searchTerm)!==-1; });
     });
 
-    if(currentArchiveSort==='default') filtered.sort(function(a,b){return b.origIdx-a.origIdx;});
-    else if(currentArchiveSort==='newest') filtered.sort(function(a,b){return a.origIdx-b.origIdx;});
+    if(currentArchiveSort==='default') filtered.sort(function(a,b){return new Date(b.order.date||0) - new Date(a.order.date||0);});
+    else if(currentArchiveSort==='newest') filtered.sort(function(a,b){return new Date(a.order.date||0) - new Date(b.order.date||0);});
     else if(currentArchiveSort==='due-asc') filtered.sort(function(a,b){return (a.order.dueDate||'9999').localeCompare(b.order.dueDate||'9999');});
     else if(currentArchiveSort==='due-desc') filtered.sort(function(a,b){return (b.order.dueDate||'9999').localeCompare(a.order.dueDate||'9999');});
     else if(currentArchiveSort==='fit-asc') filtered.sort(function(a,b){return (a.order.fittingDate||'9999').localeCompare(b.order.fittingDate||'9999');});
@@ -1120,6 +1127,12 @@
     updateStuckFilterButton();
     updateUnpaidFilterButton();
     renderOrders(); 
+  }
+  
+  function clearSearch() {
+    document.getElementById('order-search').value = '';
+    document.getElementById('search-clear').style.display = 'none';
+    renderOrders();
   }
   
   function updateStatusFilterButtons() {

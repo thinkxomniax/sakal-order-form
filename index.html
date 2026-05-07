@@ -438,8 +438,11 @@
           }
         });
         
-        if (currentTab === 'orders') renderOrders();
-        else renderArchive();
+        if (currentTab === 'orders') {
+          renderOrders();
+        } else {
+          renderArchive();
+        }
         
         if (btn) btn.textContent = '🔄 Refresh';
         showToast('✓ Data loaded');
@@ -490,11 +493,15 @@
   window.onload = function() {
     // Try fetch from API
     fetchOrdersFromServer();
-    // But also load from cache in case API fails
+    // Fallback: load from cache in case API fails
     setTimeout(function() {
       if(orders.length === 0 && archivedOrders.length === 0) {
         loadFromLocalStorage();
       }
+      // PENTING: Render setelah data load!
+      renderOrders();
+      renderArchive();
+      // Update button highlighting
       updateSortButtons();
       updateArchiveSortButtons();
       updateProductFilterButtons();
@@ -928,14 +935,20 @@
       if(activeStuckFilter && !items.some(function(it){return it.stuck;})) return false;
       if(activeUnpaidFilter && !items.some(function(it){return !it.paid;})) return false;
       
-      // Check search - return true jika search kosong atau match ditemukan
-      if(!searchTerm) {
-        // Jika tidak ada search term tapi ada active filters lain, tetap return true
-        return (activeStatusFilter || activeStuckFilter || activeUnpaidFilter || hasProductFilter);
+      // Check search - ONLY if there's a search term
+      if(searchTerm) {
+        // Search by order number
+        if(o.orderNum.toLowerCase().indexOf(searchTerm) !== -1) return true;
+        // Search by remarks
+        if((o.remarks||'').toLowerCase().indexOf(searchTerm) !== -1) return true;
+        // Search by fabric or lining
+        if(items.some(function(it){ return (it.fabric||'').toLowerCase().indexOf(searchTerm) !== -1 || (it.lining||'').toLowerCase().indexOf(searchTerm) !== -1; })) return true;
+        // NO MATCH found for search term
+        return false;
       }
-      // Ada search term, check apakah match
-      if(o.orderNum.toLowerCase().indexOf(searchTerm)!==-1 || (o.remarks||'').toLowerCase().indexOf(searchTerm)!==-1) return true;
-      return items.some(function(it){ return (it.fabric||'').toLowerCase().indexOf(searchTerm)!==-1 || (it.lining||'').toLowerCase().indexOf(searchTerm)!==-1; });
+      
+      // No search term, so return true if pass filter checks above
+      return true;
     });
 
     if(currentSort==='default') filtered.sort(function(a,b){return b.origIdx-a.origIdx;});

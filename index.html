@@ -924,13 +924,16 @@
       }
       
       // Check status/stuck/unpaid filters
-      if(!searchTerm && !activeStatusFilter && !activeStuckFilter && !activeUnpaidFilter) return true;
       if(activeStatusFilter && !items.some(function(it){return it.status===activeStatusFilter;})) return false;
       if(activeStuckFilter && !items.some(function(it){return it.stuck;})) return false;
       if(activeUnpaidFilter && !items.some(function(it){return !it.paid;})) return false;
       
-      // Check search
-      if(!searchTerm) return true;
+      // Check search - return true jika search kosong atau match ditemukan
+      if(!searchTerm) {
+        // Jika tidak ada search term tapi ada active filters lain, tetap return true
+        return (activeStatusFilter || activeStuckFilter || activeUnpaidFilter || hasProductFilter);
+      }
+      // Ada search term, check apakah match
       if(o.orderNum.toLowerCase().indexOf(searchTerm)!==-1 || (o.remarks||'').toLowerCase().indexOf(searchTerm)!==-1) return true;
       return items.some(function(it){ return (it.fabric||'').toLowerCase().indexOf(searchTerm)!==-1 || (it.lining||'').toLowerCase().indexOf(searchTerm)!==-1; });
     });
@@ -951,8 +954,9 @@
       var dDue = o.dueDate ? formatDisplayDate(o.dueDate) : '—'; var dFit = o.fittingDate ? formatDisplayDate(o.fittingDate) : '—';
       var tom = (function(){var t=new Date(); t.setDate(t.getDate()+1); return t.getFullYear()+'-'+String(t.getMonth()+1).padStart(2,'0')+'-'+String(t.getDate()).padStart(2,'0');})();
 
+      var dOrdered = o.date ? formatDisplayDate(o.date.split('T')[0]) : '—';
       html += '<div class="order-card" id="order-card-'+oi+'"><div class="order-summary"><span class="order-summary-num">'+esc(o.orderNum)+'</span><div class="order-summary-dates">'
-        + '<div class="hdr-date-group"><span class="hdr-date-label">Ordered</span><span class="hdr-date-val">'+esc(o.date)+'</span></div>'
+        + '<div class="hdr-date-group"><span class="hdr-date-label">Ordered</span><span class="hdr-date-val">'+esc(dOrdered)+'</span></div>'
         + '<div class="hdr-date-group due-date-cell" onclick="openInlineDatePicker('+oi+',this)"><span class="hdr-date-label">Due Date</span><span class="due-date-display hdr-date-val'+(dueSoon?' due-soon':'')+'">'+esc(dDue)+'</span><input type="date" class="due-date-picker" value="'+(o.dueDate||'')+'" min="'+tom+'" onchange="saveInlineDate('+oi+',\'due\',this)" onblur="cancelInlineDate()" onclick="event.stopPropagation()"></div>'
         + '<div class="hdr-date-group fitting-date-cell" onclick="openFittingDatePicker('+oi+',this)"><span class="hdr-date-label">Fitting Date</span><span class="fitting-date-display hdr-date-val">'+esc(dFit)+'</span><input type="date" class="fitting-date-picker" value="'+(o.fittingDate||'')+'" min="'+tom+'" onchange="saveInlineDate('+oi+',\'fitting\',this)" onblur="cancelFittingDate()" onclick="event.stopPropagation()"></div>'
         + '</div><div class="order-summary-right" onclick="event.stopPropagation()">' + fittedDotsHtml(oi)
@@ -995,10 +999,10 @@
     var html = '<div class="orders-panel-label">Archived Orders</div>';
     filtered.forEach(function(e) {
       var o = e.order; var ai = e.origIdx; var items = o.items || [];
-      var dDue = o.dueDate ? formatDisplayDate(o.dueDate) : '—'; var dFit = o.fittingDate ? formatDisplayDate(o.fittingDate) : '—';
+      var dDue = o.dueDate ? formatDisplayDate(o.dueDate) : '—'; var dFit = o.fittingDate ? formatDisplayDate(o.fittingDate) : '—'; var dOrdered = o.date ? formatDisplayDate(o.date.split('T')[0]) : '—';
 
       html += '<div class="order-card" id="arc-card-'+ai+'"><div class="order-summary"><span class="order-summary-num">'+esc(o.orderNum)+'</span><div class="order-summary-dates">'
-        + '<div class="hdr-date-group"><span class="hdr-date-label">Ordered</span><span class="hdr-date-val">'+esc(o.date)+'</span></div>'
+        + '<div class="hdr-date-group"><span class="hdr-date-label">Ordered</span><span class="hdr-date-val">'+esc(dOrdered)+'</span></div>'
         + '<div class="hdr-date-group"><span class="hdr-date-label">Due Date</span><span class="hdr-date-val">'+esc(dDue)+'</span></div>'
         + '<div class="hdr-date-group"><span class="hdr-date-label">Fitting Date</span><span class="hdr-date-val">'+esc(dFit)+'</span></div>'
         + '</div><div class="order-summary-right">'

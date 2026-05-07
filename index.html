@@ -102,7 +102,7 @@
   .status-btn.on-delta        { background: #f3e8fe; border-color: #9b59b6; color: #6c3483; }
   .status-btn.on-fabricordered{ background: #fff8e1; border-color: #f0b429; color: #8a6200; }
   .status-btn.on-instore   { background: #e6f9f0; border-color: #2ecc71; color: #1a8a4a; }
-  .status-btn.on-takehome  { background: #07c164; border-color: #1A1A2E; color: #fff; }
+  .status-btn.on-takehome  { background: #1A1A2E; border-color: #1A1A2E; color: #fff; }
   .status-btn.on-bin       { background: #fff4e5; border-color: #e0913a; color: #b86c10; }
   .status-btn.on-stuck     { background: #fdecea; border-color: #e74c3c; color: #c0392b; font-weight: 700; }
   .none-btn-active { background: var(--accent) !important; border-color: var(--accent) !important; color: #fff !important; }
@@ -167,9 +167,11 @@
   .sort-btn.active-desc { background: #1a8a4a; border-color: #1a8a4a; color: #fff; }
   .filter-divider { width: 1px; height: 28px; background: var(--border-strong); flex-shrink: 0; }
 
-  .search-wrap { margin-bottom: 1rem; }
-  .search-input { width: 100%; height: 44px; padding: 0 16px 0 40px; border: 1.5px solid var(--border-strong); border-radius: var(--radius-sm); font-family: 'Helvetica Neue', sans-serif; font-size: 14px; color: var(--text); background: var(--surface); outline: none; transition: border-color 0.15s, box-shadow 0.15s; -webkit-appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23aaa' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cline x1='21' y1='21' x2='16.65' y2='16.65'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: 12px center; }
+  .search-wrap { margin-bottom: 1rem; position: relative; }
+  .search-input { width: 100%; height: 44px; padding: 0 40px 0 40px; border: 1.5px solid var(--border-strong); border-radius: var(--radius-sm); font-family: 'Helvetica Neue', sans-serif; font-size: 14px; color: var(--text); background: var(--surface); outline: none; transition: border-color 0.15s, box-shadow 0.15s; -webkit-appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23aaa' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cline x1='21' y1='21' x2='16.65' y2='16.65'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: 12px center; }
   .search-input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(28,28,48,0.09); }
+  .search-clear-btn { position: absolute; right: 12px; top: 50%; transform: translateY(-50%); background: none; border: none; color: var(--text-muted); cursor: pointer; font-size: 16px; padding: 4px 8px; transition: color 0.15s; }
+  .search-clear-btn:hover { color: var(--text); }
   
   /* ── RESPONSIVE PADA IPAD & TABLET (Layar < 1024px) ── */
   @media screen and (max-width: 1024px) {
@@ -276,7 +278,8 @@
     <!-- Orders tab content -->
     <div id="pane-orders" style="">
       <div class="search-wrap">
-        <input class="search-input" type="text" id="order-search" placeholder="Search by order no., fabric, lining or remarks…" oninput="renderOrders()" autocomplete="off">
+        <input class="search-input" type="text" id="order-search" placeholder="Search by order no., fabric, lining or remarks…" oninput="renderOrders()" onkeypress="if(event.key==='Enter') renderOrders();" autocomplete="off">
+        <button class="search-clear-btn" id="search-clear" onclick="clearSearch()" style="display:none;">✕</button>
       </div>
       <div class="filter-bar">
         <span class="filter-label">Sort by</span>
@@ -438,8 +441,11 @@
           }
         });
         
-        if (currentTab === 'orders') renderOrders();
-        else renderArchive();
+        if (currentTab === 'orders') {
+          renderOrders();
+        } else {
+          renderArchive();
+        }
         
         if (btn) btn.textContent = '🔄 Refresh';
         showToast('✓ Data loaded');
@@ -490,11 +496,15 @@
   window.onload = function() {
     // Try fetch from API
     fetchOrdersFromServer();
-    // But also load from cache in case API fails
+    // Fallback: load from cache in case API fails
     setTimeout(function() {
       if(orders.length === 0 && archivedOrders.length === 0) {
         loadFromLocalStorage();
       }
+      // PENTING: Render setelah data load!
+      renderOrders();
+      renderArchive();
+      // Update button highlighting
       updateSortButtons();
       updateArchiveSortButtons();
       updateProductFilterButtons();
@@ -910,6 +920,10 @@
 
   function renderOrders() {
     var el = document.getElementById('orders-content'); var searchEl = document.getElementById('order-search'); var searchTerm = searchEl ? searchEl.value.trim().toLowerCase() : '';
+    
+    // Show/hide search clear button
+    document.getElementById('search-clear').style.display = searchTerm ? 'block' : 'none';
+    
     var hasProductFilter = Object.keys(activeProductFilters).some(function(k) { return activeProductFilters[k]; });
     
     var filtered = orders.map(function(o,i){return {order:o, origIdx:i};}).filter(function(e){
@@ -928,18 +942,24 @@
       if(activeStuckFilter && !items.some(function(it){return it.stuck;})) return false;
       if(activeUnpaidFilter && !items.some(function(it){return !it.paid;})) return false;
       
-      // Check search - return true jika search kosong atau match ditemukan
-      if(!searchTerm) {
-        // Jika tidak ada search term tapi ada active filters lain, tetap return true
-        return (activeStatusFilter || activeStuckFilter || activeUnpaidFilter || hasProductFilter);
+      // Check search - ONLY if there's a search term
+      if(searchTerm) {
+        // Search by order number
+        if(o.orderNum.toLowerCase().indexOf(searchTerm) !== -1) return true;
+        // Search by remarks
+        if((o.remarks||'').toLowerCase().indexOf(searchTerm) !== -1) return true;
+        // Search by fabric or lining
+        if(items.some(function(it){ return (it.fabric||'').toLowerCase().indexOf(searchTerm) !== -1 || (it.lining||'').toLowerCase().indexOf(searchTerm) !== -1; })) return true;
+        // NO MATCH found for search term
+        return false;
       }
-      // Ada search term, check apakah match
-      if(o.orderNum.toLowerCase().indexOf(searchTerm)!==-1 || (o.remarks||'').toLowerCase().indexOf(searchTerm)!==-1) return true;
-      return items.some(function(it){ return (it.fabric||'').toLowerCase().indexOf(searchTerm)!==-1 || (it.lining||'').toLowerCase().indexOf(searchTerm)!==-1; });
+      
+      // No search term, so return true if pass filter checks above
+      return true;
     });
 
-    if(currentSort==='default') filtered.sort(function(a,b){return b.origIdx-a.origIdx;});
-    else if(currentSort==='newest') filtered.sort(function(a,b){return a.origIdx-b.origIdx;});
+    if(currentSort==='default') filtered.sort(function(a,b){return new Date(b.order.date||0) - new Date(a.order.date||0);});
+    else if(currentSort==='newest') filtered.sort(function(a,b){return new Date(a.order.date||0) - new Date(b.order.date||0);});
     else if(currentSort==='due-asc') filtered.sort(function(a,b){return (a.order.dueDate||'9999').localeCompare(b.order.dueDate||'9999');});
     else if(currentSort==='due-desc') filtered.sort(function(a,b){return (b.order.dueDate||'9999').localeCompare(a.order.dueDate||'9999');});
     else if(currentSort==='fit-asc') filtered.sort(function(a,b){return (a.order.fittingDate||'9999').localeCompare(b.order.fittingDate||'9999');});
@@ -987,8 +1007,8 @@
       return (o.items||[]).some(function(it){ return (it.fabric||'').toLowerCase().indexOf(searchTerm)!==-1 || (it.lining||'').toLowerCase().indexOf(searchTerm)!==-1; });
     });
 
-    if(currentArchiveSort==='default') filtered.sort(function(a,b){return b.origIdx-a.origIdx;});
-    else if(currentArchiveSort==='newest') filtered.sort(function(a,b){return a.origIdx-b.origIdx;});
+    if(currentArchiveSort==='default') filtered.sort(function(a,b){return new Date(b.order.date||0) - new Date(a.order.date||0);});
+    else if(currentArchiveSort==='newest') filtered.sort(function(a,b){return new Date(a.order.date||0) - new Date(b.order.date||0);});
     else if(currentArchiveSort==='due-asc') filtered.sort(function(a,b){return (a.order.dueDate||'9999').localeCompare(b.order.dueDate||'9999');});
     else if(currentArchiveSort==='due-desc') filtered.sort(function(a,b){return (b.order.dueDate||'9999').localeCompare(a.order.dueDate||'9999');});
     else if(currentArchiveSort==='fit-asc') filtered.sort(function(a,b){return (a.order.fittingDate||'9999').localeCompare(b.order.fittingDate||'9999');});
@@ -1107,6 +1127,12 @@
     updateStuckFilterButton();
     updateUnpaidFilterButton();
     renderOrders(); 
+  }
+  
+  function clearSearch() {
+    document.getElementById('order-search').value = '';
+    document.getElementById('search-clear').style.display = 'none';
+    renderOrders();
   }
   
   function updateStatusFilterButtons() {

@@ -942,22 +942,29 @@
       if(activeStuckFilter && !items.some(function(it){return it.stuck;})) return false;
       if(activeUnpaidFilter && !items.some(function(it){return !it.paid;})) return false;
       
-      // Check search - ONLY if there's a search term
-      if(searchTerm) {
-        // Search by order number
-        if(o.orderNum.toLowerCase().indexOf(searchTerm) !== -1) return true;
-        // Search by remarks
-        if((o.remarks||'').toLowerCase().indexOf(searchTerm) !== -1) return true;
-        // Search by fabric or lining
-        if(items.some(function(it){ return (it.fabric||'').toLowerCase().indexOf(searchTerm) !== -1 || (it.lining||'').toLowerCase().indexOf(searchTerm) !== -1; })) return true;
-        // NO MATCH found for search term
-        return false;
-      }
-      
-      // No search term, so return true if pass filter checks above
-      return true;
-    });
+     // Check search - ONLY if there's a search term
+if(searchTerm) {
 
+  // Search by order number
+  if((o.orderNum || '').toLowerCase().indexOf(searchTerm) !== -1) return true;
+
+  // Search by remarks
+  if((o.remarks || '').toLowerCase().indexOf(searchTerm) !== -1) return true;
+
+  // Search by fabric or lining
+  if(items.some(function(it){
+    return (
+      (it.fabric || '').toLowerCase().indexOf(searchTerm) !== -1 ||
+      (it.lining || '').toLowerCase().indexOf(searchTerm) !== -1
+    );
+  })) return true;
+
+  // NO MATCH found for search term
+  return false;
+}
+
+// No search term, so return true if pass filter checks above
+return true;
     if(currentSort==='default') filtered.sort(function(a,b){return new Date(b.order.date||0) - new Date(a.order.date||0);});
     else if(currentSort==='newest') filtered.sort(function(a,b){return new Date(a.order.date||0) - new Date(b.order.date||0);});
     else if(currentSort==='due-asc') filtered.sort(function(a,b){return (a.order.dueDate||'9999').localeCompare(b.order.dueDate||'9999');});

@@ -215,7 +215,8 @@
       </div>
       <div class="filter-bar">
         <span class="filter-label">Sort by</span>
-        <button class="sort-btn active" data-sort="default" onclick="toggleSort()">Newest First</button>
+        <button class="sort-btn active" data-sort="newest" onclick="setSort('newest')">Newest First</button>
+        <button class="sort-btn" data-sort="oldest" onclick="setSort('oldest')">Oldest First</button>
         <div class="filter-divider"></div>
         <span class="filter-label">Due Date</span>
         <button class="sort-btn" data-sort="due-asc" onclick="toggleDueSort()">↑ Earliest</button>
@@ -337,7 +338,7 @@
 
   // ── STATE ──
   var selectedItems = [], orders = [], archivedOrders = [];
-  var currentSort = 'default', currentArchiveSort = 'default', currentTab = 'orders';
+  var currentSort = 'newest', currentArchiveSort = 'newest', currentTab = 'orders';
   var activeStatusFilter = null, activeStuckFilter = false, activeUnpaidFilter = false, activeProductFilters = {};
   var editIdx = -1, delPendingType = '', delPendingOi = -1, delPendingIi = -1;
   var tlPendingOi = -1, tlPendingNext = 0, tlEditingExisting = false;
@@ -731,8 +732,18 @@
       return true;
     });
 
-    if(currentSort==='default')   filtered.sort(function(a,b){ return (b.order.date||'').localeCompare(a.order.date||''); });
-    else if(currentSort==='newest')   filtered.sort(function(a,b){ return (a.order.date||'').localeCompare(b.order.date||''); });
+    if(currentSort==='newest') {
+      filtered.sort(function(a,b){
+        var dateCompare = (b.order.date||'').localeCompare(a.order.date||'');
+        return dateCompare !== 0 ? dateCompare : (b.order.orderNum||'').localeCompare(a.order.orderNum||'');
+      });
+    }
+    else if(currentSort==='oldest') {
+      filtered.sort(function(a,b){
+        var dateCompare = (a.order.date||'').localeCompare(b.order.date||'');
+        return dateCompare !== 0 ? dateCompare : (a.order.orderNum||'').localeCompare(b.order.orderNum||'');
+      });
+    }
     else if(currentSort==='due-asc')  filtered.sort(function(a,b){ return (a.order.dueDate||'9999').localeCompare(b.order.dueDate||'9999'); });
     else if(currentSort==='due-desc') filtered.sort(function(a,b){ return (b.order.dueDate||'9999').localeCompare(a.order.dueDate||'9999'); });
     else if(currentSort==='fit-asc')  filtered.sort(function(a,b){ return (a.order.fittingDate||'9999').localeCompare(b.order.fittingDate||'9999'); });
@@ -784,8 +795,18 @@
       return (o.items||[]).some(function(it){ return (it.fabric||'').toLowerCase().indexOf(searchTerm)!==-1||(it.lining||'').toLowerCase().indexOf(searchTerm)!==-1; });
     });
 
-    if(currentArchiveSort==='default')   filtered.sort(function(a,b){ return (b.order.date||'').localeCompare(a.order.date||''); });
-    else if(currentArchiveSort==='newest')   filtered.sort(function(a,b){ return (a.order.date||'').localeCompare(b.order.date||''); });
+    if(currentArchiveSort==='newest') {
+      filtered.sort(function(a,b){
+        var dateCompare = (b.order.date||'').localeCompare(a.order.date||'');
+        return dateCompare !== 0 ? dateCompare : (b.order.orderNum||'').localeCompare(a.order.orderNum||'');
+      });
+    }
+    else if(currentArchiveSort==='oldest') {
+      filtered.sort(function(a,b){
+        var dateCompare = (a.order.date||'').localeCompare(b.order.date||'');
+        return dateCompare !== 0 ? dateCompare : (a.order.orderNum||'').localeCompare(b.order.orderNum||'');
+      });
+    }
     else if(currentArchiveSort==='due-asc')  filtered.sort(function(a,b){ return (a.order.dueDate||'9999').localeCompare(b.order.dueDate||'9999'); });
     else if(currentArchiveSort==='due-desc') filtered.sort(function(a,b){ return (b.order.dueDate||'9999').localeCompare(a.order.dueDate||'9999'); });
     else if(currentArchiveSort==='fit-asc')  filtered.sort(function(a,b){ return (a.order.fittingDate||'9999').localeCompare(b.order.fittingDate||'9999'); });
@@ -823,10 +844,10 @@
   // ── SORT & FILTER ──
   function setSort(mode)        { currentSort=mode; updateSortButtons(); renderOrders(); }
   function setArchiveSort(mode) { currentArchiveSort=mode; updateArchiveSortButtons(); renderArchive(); }
-  function toggleSort()           { setSort(currentSort==='newest'?'default':'newest'); }
+  function toggleSort()           { setSort(currentSort==='newest'?'oldest':'newest'); }
   function toggleDueSort()        { setSort(currentSort==='due-asc'?'due-desc':'due-asc'); }
   function toggleFitSort()        { setSort(currentSort==='fit-asc'?'fit-desc':'fit-asc'); }
-  function toggleArchiveSort()    { setArchiveSort(currentArchiveSort==='newest'?'default':'newest'); }
+  function toggleArchiveSort()    { setArchiveSort(currentArchiveSort==='newest'?'oldest':'newest'); }
   function toggleArchiveDueSort() { setArchiveSort(currentArchiveSort==='due-asc'?'due-desc':'due-asc'); }
   function toggleArchiveFitSort() { setArchiveSort(currentArchiveSort==='fit-asc'?'fit-desc':'fit-asc'); }
   function updateSortButtons() { document.querySelectorAll('[data-sort]').forEach(function(b){ b.classList.remove('active'); }); var a=document.querySelector('[data-sort="'+currentSort+'"]'); if(a) a.classList.add('active'); }

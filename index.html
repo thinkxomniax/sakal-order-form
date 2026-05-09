@@ -435,6 +435,8 @@
         archivedOrders = [];
         var data = result.data || [];
         data.forEach(function(o) {
+          // Pastikan orderNum selalu string
+          o.orderNum = String(o.orderNum || '').trim();
           if(o.archived) {
             archivedOrders.push(o);
           } else {
@@ -442,14 +444,9 @@
           }
         });
         
-        if (currentTab === 'orders') {
-          renderOrders();
-        } else {
-          renderArchive();
-        }
-        // Also render the hidden tab so it's ready (search terms are read from DOM inputs each render)
-        if (currentTab === 'orders') renderArchive();
-        else renderOrders();
+        // Render kedua tab — search term tetap terbaca dari DOM input
+        renderOrders();
+        renderArchive();
         
         if (btn) btn.textContent = '🔄 Refresh';
         showToast('✓ Data loaded');
@@ -468,19 +465,19 @@
       var saved = localStorage.getItem('sakal-orders');
       if(saved) {
         var data = JSON.parse(saved);
-        orders = data.orders || [];
-        archivedOrders = data.archived || [];
-        if (currentTab === 'orders') renderOrders();
-        else renderArchive();
+        orders = (data.orders || []).map(function(o){ o.orderNum = String(o.orderNum||'').trim(); return o; });
+        archivedOrders = (data.archived || []).map(function(o){ o.orderNum = String(o.orderNum||'').trim(); return o; });
+        renderOrders();
+        renderArchive();
         showToast('📦 Loaded from cache (offline mode)');
       } else {
-        if (currentTab === 'orders') renderOrders();
-        else renderArchive();
+        renderOrders();
+        renderArchive();
       }
     } catch (e) {
       console.log('Cache error:', e);
-      if (currentTab === 'orders') renderOrders();
-      else renderArchive();
+      renderOrders();
+      renderArchive();
     }
   }
   
@@ -498,30 +495,23 @@
   }
 
   window.onload = function() {
-    // Try fetch from API
     fetchOrdersFromServer();
-    // Fallback: load from cache in case API fails
+    // Fallback: jika setelah 2 detik data masih kosong, load dari cache
     setTimeout(function() {
-      if(orders.length === 0 && archivedOrders.length === 0) {
+      if (orders.length === 0 && archivedOrders.length === 0) {
         loadFromLocalStorage();
       }
-      // PENTING: Render setelah data load!
-      renderOrders();
-      renderArchive();
-      // Update button highlighting
       updateSortButtons();
       updateArchiveSortButtons();
       updateProductFilterButtons();
-    }, 500);
+    }, 2000);
   };
-  // Auto-refresh on window focus (only if no active search to avoid disrupting search input)
+  // Auto-refresh hanya saat window focus DAN tidak ada search aktif
   window.addEventListener('focus', function() {
-    var orderSearch = document.getElementById('order-search');
-    var archiveSearch = document.getElementById('archive-search');
-    var hasActiveSearch = (orderSearch && orderSearch.value.trim()) || (archiveSearch && archiveSearch.value.trim());
-    if (!hasActiveSearch) {
-      fetchOrdersFromServer();
-    }
+    var oSearch = document.getElementById('order-search');
+    var aSearch = document.getElementById('archive-search');
+    var hasSearch = (oSearch && oSearch.value.trim()) || (aSearch && aSearch.value.trim());
+    if (!hasSearch) fetchOrdersFromServer();
   });
 
   // ==========================================
@@ -956,8 +946,8 @@
       
       // Check search - ONLY if there's a search term
       if(searchTerm) {
-        // Search by order number
-        if(o.orderNum.toLowerCase().indexOf(searchTerm) !== -1) return true;
+        // Search by order number (force string comparison)
+        if(String(o.orderNum||'').toLowerCase().indexOf(searchTerm) !== -1) return true;
         // Search by remarks
         if((o.remarks||'').toLowerCase().indexOf(searchTerm) !== -1) return true;
         // Search by fabric or lining
@@ -1012,15 +1002,17 @@
   }
 
   function renderArchive() {
-    var el = document.getElementById('archive-content'); var searchEl = document.getElementById('archive-search'); var searchTerm = searchEl ? searchEl.value.trim().toLowerCase() : '';
-    
-    // Show/hide archive search clear button
-    var archiveClear = document.getElementById('archive-search-clear');
-    if (archiveClear) archiveClear.style.display = searchTerm ? 'block' : 'none';
-    
+    var el = document.getElementById('archive-content');
+    var searchEl = document.getElementById('archive-search');
+    var searchTerm = searchEl ? searchEl.value.trim().toLowerCase() : '';
+
+    // Update clear button visibility
+    var clearBtn = document.getElementById('archive-search-clear');
+    if (clearBtn) clearBtn.style.display = searchTerm ? 'block' : 'none';
+
     var filtered = archivedOrders.map(function(o,i){return {order:o, origIdx:i};}).filter(function(e){
       var o = e.order; if(!searchTerm) return true;
-      if(o.orderNum.toLowerCase().indexOf(searchTerm)!==-1 || (o.remarks||'').toLowerCase().indexOf(searchTerm)!==-1) return true;
+      if(String(o.orderNum||'').toLowerCase().indexOf(searchTerm)!==-1 || (o.remarks||'').toLowerCase().indexOf(searchTerm)!==-1) return true;
       return (o.items||[]).some(function(it){ return (it.fabric||'').toLowerCase().indexOf(searchTerm)!==-1 || (it.lining||'').toLowerCase().indexOf(searchTerm)!==-1; });
     });
 
@@ -1151,7 +1143,7 @@
     document.getElementById('search-clear').style.display = 'none';
     renderOrders();
   }
-  
+
   function clearArchiveSearch() {
     document.getElementById('archive-search').value = '';
     document.getElementById('archive-search-clear').style.display = 'none';

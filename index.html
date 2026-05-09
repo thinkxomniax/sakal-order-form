@@ -4,55 +4,38 @@
 <title>ŠAKAL — Order List</title>
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
   :root {
-    --bg: #F5F3EF;
-    --surface: #FFFFFF;
-    --surface2: #EEECEA;
-    --border: rgba(0,0,0,0.09);
-    --border-strong: rgba(0,0,0,0.18);
-    --text: #181818;
-    --text-muted: #666;
-    --text-faint: #AAA;
-    --accent: #1C1C30;
-    --accent2: #3B3B60;
-    --accent-text: #ffffff;
-    --radius: 14px;
-    --radius-sm: 10px;
-    --touch: 52px;
+    --bg: #F5F3EF; --surface: #FFFFFF; --surface2: #EEECEA;
+    --border: rgba(0,0,0,0.09); --border-strong: rgba(0,0,0,0.18);
+    --text: #181818; --text-muted: #666; --text-faint: #AAA;
+    --accent: #1C1C30; --accent2: #3B3B60; --accent-text: #ffffff;
+    --radius: 14px; --radius-sm: 10px; --touch: 52px;
   }
-
   body { font-family: 'Georgia', serif; background: var(--bg); color: var(--text); min-height: 100vh; -webkit-text-size-adjust: 100%; }
-
   .masthead { padding: 1.25rem 1.75rem 1rem; background: var(--accent); display: flex; align-items: center; justify-content: space-between; gap: 1rem; }
   .masthead-left { display: flex; flex-direction: column; gap: 2px; }
   .brand { font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase; color: rgba(255,255,255,0.45); font-family: 'Helvetica Neue', sans-serif; }
   .doc-title { font-size: 22px; font-weight: normal; letter-spacing: -0.01em; color: #fff; }
   .save-fab { padding: 0 22px; height: var(--touch); background: rgba(255,255,255,0.12); color: #fff; border: 1.5px solid rgba(255,255,255,0.22); border-radius: 30px; font-family: 'Helvetica Neue', sans-serif; font-size: 14px; letter-spacing: 0.04em; cursor: pointer; transition: background 0.15s, transform 0.1s; white-space: nowrap; flex-shrink: 0; }
   .save-fab:active { transform: scale(0.96); }
-  .save-fab.saved  { background: #1a8a4a; border-color: #1a8a4a; }
-
+  .save-fab.saved { background: #1a8a4a; border-color: #1a8a4a; }
   .workspace { display: flex; align-items: flex-start; min-height: calc(100vh - 72px); }
   .left-panel { width: 320px; min-width: 320px; padding: 0; border-right: 1px solid var(--border-strong); background: var(--surface); position: sticky; top: 0; height: calc(100vh - 72px); overflow-y: hidden; display: flex; flex-direction: column; }
   .left-panel-scroll { flex: 1; overflow-y: auto; min-height: 0; padding: 1.5rem 1.25rem 0.75rem; }
   .left-panel-footer { flex-shrink: 0; padding: 0.75rem 1.25rem 1rem; border-top: 1px solid var(--border-strong); background: var(--surface); }
   .right-panel { flex: 1; padding: 1.5rem 1.75rem 2rem; min-height: calc(100vh - 72px); overflow-x: auto; }
-
   .section-label { font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--text-faint); margin-bottom: 8px; margin-top: 1.1rem; font-family: 'Helvetica Neue', sans-serif; }
   .section-label:first-child { margin-top: 0; }
-
   .ref-input { width: 100%; height: var(--touch); padding: 0 16px; border: 1.5px solid var(--border-strong); border-radius: var(--radius-sm); font-family: inherit; font-size: 16px; color: var(--text); background: var(--surface); outline: none; transition: border-color 0.15s, box-shadow 0.15s; -webkit-appearance: none; }
   .ref-input::placeholder { color: var(--text-faint); }
   .ref-input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(28,28,48,0.1); }
   .error-msg { color: #c0392b; font-size: 12px; margin-top: 4px; display: none; font-family: 'Helvetica Neue', sans-serif; }
-
   .product-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 9px; }
   .product-btn { height: 58px; border-radius: var(--radius); border: 1.5px solid var(--border-strong); background: var(--surface); cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.15s; user-select: none; -webkit-tap-highlight-color: transparent; }
   .product-btn .btn-name { font-size: 14px; font-weight: normal; color: var(--text-muted); letter-spacing: 0.01em; font-family: 'Helvetica Neue', sans-serif; pointer-events: none; }
   .product-btn.selected { background: var(--accent); border-color: var(--accent); }
   .product-btn.selected .btn-name { color: rgba(255,255,255,0.9); }
   .product-btn:not(.selected):active { background: var(--surface2); }
-
   .fabric-fields { display: flex; flex-direction: column; gap: 8px; margin-top: 4px; }
   .fabric-card { background: var(--surface2); border: 1.5px solid var(--border); border-radius: var(--radius-sm); padding: 12px 14px; }
   .fabric-card-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
@@ -65,10 +48,8 @@
   .fabric-row input { flex: 1; height: 44px; padding: 0 12px; border: 1.5px solid var(--border-strong); border-radius: var(--radius-sm); font-family: inherit; font-size: 15px; color: var(--text); background: var(--surface); outline: none; transition: border-color 0.15s, box-shadow 0.15s; -webkit-appearance: none; }
   .fabric-row input::placeholder { color: var(--text-faint); }
   .fabric-row input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(28,28,48,0.08); }
-
   .submit-btn { width: 100%; margin-top: 1rem; height: 56px; background: var(--accent); color: #fff; border: none; border-radius: var(--radius); font-family: 'Helvetica Neue', sans-serif; font-size: 15px; letter-spacing: 0.06em; cursor: pointer; transition: opacity 0.15s, transform 0.1s; -webkit-tap-highlight-color: transparent; }
   .submit-btn:active { opacity: 0.8; transform: scale(0.98); }
-
   .orders-panel-label { font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--text-faint); margin-bottom: 1rem; font-family: 'Helvetica Neue', sans-serif; }
   .order-card { background: var(--surface); border: 1.5px solid var(--border-strong); border-radius: var(--radius); margin-bottom: 10px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
   .order-summary { display: flex; align-items: center; gap: 10px; padding: 10px 14px; background: var(--surface2); border-bottom: 1.5px solid var(--border); min-height: 48px; }
@@ -84,58 +65,45 @@
   .detail-item { display: flex; align-items: center; gap: 8px; padding: 9px 16px; border-bottom: 1px solid var(--border); flex-wrap: wrap; }
   .detail-item:last-child { border-bottom: none; }
   .detail-product-name { font-size: 13px; font-weight: 600; color: var(--text); min-width: 80px; flex-shrink: 0; }
-  .detail-fabric-meta  { font-size: 11px; color: var(--text-faint); flex: 1; white-space: nowrap; }
+  .detail-fabric-meta { font-size: 11px; color: var(--text-faint); flex: 1; white-space: nowrap; }
   .detail-item-actions { display: flex; align-items: center; gap: 8px; flex-shrink: 0; margin-left: auto; }
-
-  .fitted-lights { display: flex; gap: 6px; align-items: center; cursor: pointer; user-select: none; -webkit-tap-highlight-color: transparent; padding: 6px 0; }
   .fitted-dot { width: 18px; height: 18px; border-radius: 50%; border: 2px solid rgba(0,0,0,0.12); transition: all 0.18s; flex-shrink: 0; }
-  .fitted-dot.red    { background: #e74c3c; border-color: #c0392b; box-shadow: 0 0 5px rgba(231,76,60,0.45); }
-  .fitted-dot.amber  { background: #f39c12; border-color: #d68910; box-shadow: 0 0 5px rgba(243,156,18,0.45); }
-  .fitted-dot.green  { background: #2ecc71; border-color: #27ae60; box-shadow: 0 0 5px rgba(46,204,113,0.45); }
-  .fitted-dot.off    { background: #ddd; border-color: #bbb; }
+  .fitted-dot.red   { background: #e74c3c; border-color: #c0392b; box-shadow: 0 0 5px rgba(231,76,60,0.45); }
+  .fitted-dot.amber { background: #f39c12; border-color: #d68910; box-shadow: 0 0 5px rgba(243,156,18,0.45); }
+  .fitted-dot.green { background: #2ecc71; border-color: #27ae60; box-shadow: 0 0 5px rgba(46,204,113,0.45); }
+  .fitted-dot.off   { background: #ddd; border-color: #bbb; }
   .tl-delete-btn { width: 16px; height: 16px; border-radius: 50%; border: 1.5px solid var(--border-strong); background: var(--surface); color: var(--text-muted); font-size: 10px; line-height: 1; cursor: pointer; display: flex; align-items: center; justify-content: center; padding: 0; transition: background 0.15s, color 0.15s, border-color 0.15s; }
   .tl-delete-btn:hover { background: #e74c3c; border-color: #c0392b; color: #fff; }
-
   .status-btn { display: inline-flex; align-items: center; justify-content: center; min-width: 80px; height: 38px; padding: 0 12px; border-radius: 8px; border: 1.5px solid var(--border-strong); background: var(--surface); font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--text-faint); cursor: pointer; transition: all 0.15s; user-select: none; white-space: nowrap; font-family: 'Helvetica Neue', sans-serif; -webkit-tap-highlight-color: transparent; }
   .status-btn:active { opacity: 0.7; }
-  .status-btn.on-batam        { background: #e8f0fe; border-color: #4a6cf7; color: #2d50d6; }
-  .status-btn.on-delta        { background: #f3e8fe; border-color: #9b59b6; color: #6c3483; }
-  .status-btn.on-fabricordered{ background: #fff8e1; border-color: #f0b429; color: #8a6200; }
-  .status-btn.on-instore   { background: #e6f9f0; border-color: #2ecc71; color: #1a8a4a; }
-  .status-btn.on-takehome  { background: #1A1A2E; border-color: #1A1A2E; color: #fff; }
-  .status-btn.on-bin       { background: #fff4e5; border-color: #e0913a; color: #b86c10; }
-  .status-btn.on-stuck     { background: #fdecea; border-color: #e74c3c; color: #c0392b; font-weight: 700; }
+  .status-btn.on-batam         { background: #e8f0fe; border-color: #4a6cf7; color: #2d50d6; }
+  .status-btn.on-delta         { background: #f3e8fe; border-color: #9b59b6; color: #6c3483; }
+  .status-btn.on-fabricordered { background: #fff8e1; border-color: #f0b429; color: #8a6200; }
+  .status-btn.on-instore       { background: #e6f9f0; border-color: #2ecc71; color: #1a8a4a; }
+  .status-btn.on-takehome      { background: #1A1A2E; border-color: #1A1A2E; color: #fff; }
+  .status-btn.on-bin           { background: #fff4e5; border-color: #e0913a; color: #b86c10; }
+  .status-btn.on-stuck         { background: #fdecea; border-color: #e74c3c; color: #c0392b; font-weight: 700; }
+  .status-btn.on-invoice       { background: #1A1A2E; border-color: #1A1A2E; color: #fff; }
   .none-btn-active { background: var(--accent) !important; border-color: var(--accent) !important; color: #fff !important; }
-  .status-btn.on-invoice   { background: #1A1A2E; border-color: #1A1A2E; color: #fff; }
-
   .delete-btn, .edit-btn { display: inline-flex; align-items: center; justify-content: center; width: 38px; height: 38px; border-radius: 8px; border: 1.5px solid var(--border-strong); background: var(--surface); color: var(--text-faint); font-size: 16px; cursor: pointer; transition: all 0.15s; user-select: none; -webkit-tap-highlight-color: transparent; }
   .delete-btn:active { background: #fdecea; border-color: #e74c3c; color: #e74c3c; }
-  .edit-btn:active { background: var(--surface2); border-color: var(--accent); color: var(--accent); }
-
-  .orders-footer { display: flex; justify-content: space-between; align-items: flex-end; margin-top: 1.5rem; padding-top: 1rem; border-top: 1px solid var(--border-strong); }
-  .orders-count { font-size: 12px; color: var(--text-faint); }
-  
+  .edit-btn:active   { background: var(--surface2); border-color: var(--accent); color: var(--accent); }
   .right-empty { display: flex; flex-direction: column; align-items: center; justify-content: center; height: calc(100vh - 160px); color: var(--text-faint); font-size: 15px; text-align: center; }
   .right-empty-icon { font-size: 44px; opacity: 0.22; margin-bottom: 1rem; display: block; }
-
   .toast { position: fixed; bottom: 28px; left: 50%; transform: translateX(-50%) translateY(10px); background: var(--accent); color: #fff; padding: 12px 26px; border-radius: 30px; font-family: 'Helvetica Neue', sans-serif; font-size: 14px; opacity: 0; transition: opacity 0.25s, transform 0.25s; pointer-events: none; z-index: 100; white-space: nowrap; }
   .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
-
   .modal-overlay, .tl-modal-overlay, .del-modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.45); z-index: 200; align-items: center; justify-content: center; padding: 1rem; }
   .modal-overlay.open, .tl-modal-overlay.open, .del-modal-overlay.open { display: flex; }
   .modal { background: var(--surface); border-radius: var(--radius); padding: 28px 24px 20px; width: 520px; max-width: 96vw; max-height: 90vh; overflow-y: auto; box-shadow: 0 16px 60px rgba(0,0,0,0.22); }
   .tl-modal, .del-modal { background: var(--surface); border-radius: var(--radius); padding: 24px 22px 18px; width: 340px; max-width: 96vw; box-shadow: 0 16px 60px rgba(0,0,0,0.22); }
-  
   .modal-title { font-family: 'Georgia', serif; font-size: 18px; font-weight: normal; color: var(--text); margin-bottom: 22px; letter-spacing: -0.01em; }
   .modal-label { font-size: 10px; letter-spacing: 0.13em; text-transform: uppercase; color: var(--text-faint); margin-bottom: 6px; display: block; font-family: 'Helvetica Neue', sans-serif; }
   .modal-input { width: 100%; height: var(--touch); padding: 0 14px; border: 1.5px solid var(--border-strong); border-radius: var(--radius-sm); font-family: inherit; font-size: 16px; color: var(--text); background: var(--surface); outline: none; margin-bottom: 18px; transition: border-color 0.15s, box-shadow 0.15s; -webkit-appearance: none; }
   .modal-input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(28,28,48,0.09); }
   .modal-footer { display: flex; justify-content: flex-end; gap: 10px; border-top: 1px solid var(--border); padding-top: 16px; margin-top: 4px; position: sticky; bottom: 0; background: var(--surface); }
   .modal-btn { height: var(--touch); padding: 0 22px; border-radius: var(--radius-sm); font-family: 'Helvetica Neue', sans-serif; font-size: 14px; cursor: pointer; border: 1.5px solid var(--border-strong); background: var(--surface); color: var(--text-muted); transition: all 0.15s; -webkit-tap-highlight-color: transparent; }
-  .modal-btn:active { border-color: var(--accent); color: var(--text); }
   .modal-btn.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
   .modal-btn.primary:active { opacity: 0.8; }
-
   .tl-modal-title, .del-modal-title { font-family: 'Helvetica Neue', sans-serif; font-size: 14px; font-weight: 600; color: var(--text); margin-bottom: 6px; }
   .tl-modal-sub, .del-modal-msg { font-size: 11px; color: var(--text-muted); font-family: 'Helvetica Neue', sans-serif; margin-bottom: 14px; line-height: 1.5; }
   .del-modal-msg { font-size: 13px; }
@@ -143,75 +111,53 @@
   .tl-dot-preview.red   { background: #e74c3c; }
   .tl-dot-preview.amber { background: #f39c12; }
   .tl-dot-preview.green { background: #2ecc71; }
-  
   .del-modal-footer { display: flex; gap: 10px; justify-content: flex-end; }
-  .del-btn-cancel { height: 44px; padding: 0 18px; border-radius: var(--radius-sm); font-family: 'Helvetica Neue', sans-serif; font-size: 13px; cursor: pointer; border: 1.5px solid var(--border-strong); background: var(--surface); color: var(--text-muted); }
+  .del-btn-cancel  { height: 44px; padding: 0 18px; border-radius: var(--radius-sm); font-family: 'Helvetica Neue', sans-serif; font-size: 13px; cursor: pointer; border: 1.5px solid var(--border-strong); background: var(--surface); color: var(--text-muted); }
   .del-btn-confirm { height: 44px; padding: 0 18px; border-radius: var(--radius-sm); font-family: 'Helvetica Neue', sans-serif; font-size: 13px; cursor: pointer; border: 1.5px solid #e74c3c; background: #e74c3c; color: #fff; }
-
   .tab-bar { display: flex; gap: 0; border-bottom: 2px solid var(--border-strong); margin-bottom: 1rem; }
   .tab-btn { height: 54px; padding: 0 32px; border: none; border-bottom: 3px solid transparent; margin-bottom: -2px; background: transparent; font-family: 'Helvetica Neue', sans-serif; font-size: 16px; color: var(--text-faint); cursor: pointer; transition: color 0.15s, border-color 0.15s; white-space: nowrap; }
   .tab-btn:hover { color: var(--text-muted); }
   .tab-btn.active { color: var(--accent); border-bottom-color: var(--accent); font-weight: 600; }
   .tab-btn .tab-badge { display: inline-block; margin-left: 8px; background: var(--surface2); border-radius: 12px; padding: 2px 9px; font-size: 12px; font-weight: 600; color: var(--text-muted); }
   .tab-btn.active .tab-badge { background: var(--accent); color: #fff; }
-
   .archive-btn, .restore-btn { display: inline-flex; align-items: center; justify-content: center; height: 32px; padding: 0 10px; border-radius: 8px; border: 1.5px solid var(--border-strong); background: var(--surface); color: var(--text-faint); font-size: 11px; font-family: 'Helvetica Neue', sans-serif; cursor: pointer; white-space: nowrap; gap: 4px; }
   .archive-btn:hover { background: var(--surface2); color: var(--text-muted); border-color: var(--accent); }
   .restore-btn:hover { background: #e6f9f0; border-color: #2ecc71; color: #1a8a4a; }
-
   .filter-bar { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 0.75rem; align-items: center; }
   .filter-label { font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--text-faint); font-family: 'Helvetica Neue', sans-serif; white-space: nowrap; }
   .sort-btn { height: 38px; padding: 0 14px; border-radius: 8px; border: 1.5px solid var(--border-strong); background: var(--surface); font-family: 'Helvetica Neue', sans-serif; font-size: 12px; color: var(--text-muted); cursor: pointer; transition: all 0.15s; white-space: nowrap; display: inline-flex; align-items: center; gap: 5px; }
-  .sort-btn.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .sort-btn.active      { background: var(--accent); border-color: var(--accent); color: #fff; }
   .sort-btn.active-asc  { background: var(--accent); border-color: var(--accent); color: #fff; }
   .sort-btn.active-desc { background: #1a8a4a; border-color: #1a8a4a; color: #fff; }
   .filter-divider { width: 1px; height: 28px; background: var(--border-strong); flex-shrink: 0; }
-
   .search-wrap { margin-bottom: 1rem; position: relative; }
   .search-input { width: 100%; height: 44px; padding: 0 40px 0 40px; border: 1.5px solid var(--border-strong); border-radius: var(--radius-sm); font-family: 'Helvetica Neue', sans-serif; font-size: 14px; color: var(--text); background: var(--surface); outline: none; transition: border-color 0.15s, box-shadow 0.15s; -webkit-appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23aaa' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cline x1='21' y1='21' x2='16.65' y2='16.65'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: 12px center; }
   .search-input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(28,28,48,0.09); }
   .search-clear-btn { position: absolute; right: 12px; top: 50%; transform: translateY(-50%); background: none; border: none; color: var(--text-muted); cursor: pointer; font-size: 16px; padding: 4px 8px; transition: color 0.15s; }
   .search-clear-btn:hover { color: var(--text); }
-  
-  /* ── RESPONSIVE PADA IPAD & TABLET (Layar < 1024px) ── */
   @media screen and (max-width: 1024px) {
     .workspace { display: block; }
     .left-panel { width: 100%; min-width: 100%; height: auto; position: relative; overflow-y: visible; border-right: none; border-bottom: 1px solid var(--border-strong); padding: 1.5rem; }
     .right-panel { width: 100%; min-height: auto; padding: 1.5rem; }
     .product-grid { grid-template-columns: repeat(3, 1fr); }
   }
-
-  /* ── RESPONSIVE KHUSUS MOBILE / HP (Layar < 600px) ── */
- /* ── RESPONSIVE KHUSUS MOBILE / HP (Layar < 600px) ── */
   @media screen and (max-width: 600px) {
     .masthead { flex-direction: column; align-items: stretch; gap: 1rem; }
     .save-fab { width: 100%; text-align: center; justify-content: center; }
     .product-grid { grid-template-columns: 1fr 1fr; }
-    
-    /* Kurangi padding luar agar tidak termakan border */
     .right-panel { padding: 1rem 1rem 2rem; }
-
-    /* Merapikan Header Order Card (Melipat ke bawah) */
     .order-summary { flex-direction: column; align-items: flex-start; padding: 12px 14px; gap: 12px; }
     .order-summary-dates { flex-wrap: wrap; gap: 12px; width: 100%; }
-    
-    /* Tombol Archive, Edit, Delete, dan Lampu dipindah ke baris baru */
     .order-summary-right { width: 100%; flex-wrap: wrap; justify-content: flex-start; padding-top: 10px; border-top: 1px dashed var(--border-strong); }
-    
-    /* Merapikan Detail Item Produk */
     .detail-item { flex-direction: column; align-items: flex-start; padding: 12px 14px; gap: 8px; }
     .detail-fabric-meta { white-space: normal; line-height: 1.4; }
-    
-    /* Tombol Status, Stuck, Unpaid dipindah ke baris baru */
     .detail-item-actions { width: 100%; justify-content: flex-start; margin-left: 0; flex-wrap: wrap; gap: 6px; }
-    
     .modal { width: 100%; margin: 10px; padding: 20px 16px; }
   }
 </style>
 </head>
 <body>
 
-<!-- Masthead -->
 <div class="masthead">
   <div class="masthead-left">
     <span class="brand">ŠAKAL</span>
@@ -220,131 +166,114 @@
   <button class="save-fab" id="save-fab" onclick="fetchOrdersFromServer()">🔄 Refresh</button>
 </div>
 
-<!-- Workspace -->
 <div class="workspace">
-
-  <!-- LEFT: Order Form -->
   <div class="left-panel">
     <div class="left-panel-scroll">
-
-    <div class="section-label">Order No.</div>
-    <input class="ref-input" type="text" id="ordernum-input" placeholder="e.g. 2025-001" autocomplete="off">
-    <div class="error-msg" id="ordernum-error" style="display: none;">Please enter an Order No. before submitting.</div>
-
-    <div class="section-label">Due Date</div>
-    <div style="display:flex;gap:8px;align-items:center">
-      <input class="ref-input" type="date" id="duedate-input" style="flex:1">
-      <button type="button" id="duedate-none-btn" onclick="toggleNoneDate('duedate')" style="height:var(--touch);padding:0 14px;border:1.5px solid var(--border-strong);border-radius:var(--radius-sm);background:var(--surface);font-family:'Helvetica Neue',sans-serif;font-size:13px;color:var(--text-muted);cursor:pointer;white-space:nowrap;flex-shrink:0;transition:background 0.15s,color 0.15s,border-color 0.15s" class="none-btn-active">None</button>
+      <div class="section-label">Order No.</div>
+      <input class="ref-input" type="text" id="ordernum-input" placeholder="e.g. 2025-001" autocomplete="off">
+      <div class="error-msg" id="ordernum-error">Please enter an Order No. before submitting.</div>
+      <div class="section-label">Due Date</div>
+      <div style="display:flex;gap:8px;align-items:center">
+        <input class="ref-input" type="date" id="duedate-input" style="flex:1">
+        <button type="button" id="duedate-none-btn" onclick="toggleNoneDate('duedate')" class="none-btn-active" style="height:var(--touch);padding:0 14px;border:1.5px solid var(--border-strong);border-radius:var(--radius-sm);background:var(--surface);font-family:'Helvetica Neue',sans-serif;font-size:13px;color:var(--text-muted);cursor:pointer;white-space:nowrap;flex-shrink:0;transition:background 0.15s,color 0.15s,border-color 0.15s">None</button>
+      </div>
+      <div class="error-msg" id="duedate-error">Due date must be a future date.</div>
+      <div class="section-label">Fitting Date</div>
+      <div style="display:flex;gap:8px;align-items:center">
+        <input class="ref-input" type="date" id="fittingdate-input" style="flex:1">
+        <button type="button" id="fittingdate-none-btn" onclick="toggleNoneDate('fittingdate')" class="none-btn-active" style="height:var(--touch);padding:0 14px;border:1.5px solid var(--border-strong);border-radius:var(--radius-sm);background:var(--surface);font-family:'Helvetica Neue',sans-serif;font-size:13px;color:var(--text-muted);cursor:pointer;white-space:nowrap;flex-shrink:0;transition:background 0.15s,color 0.15s,border-color 0.15s">None</button>
+      </div>
+      <div class="error-msg" id="fittingdate-error">Fitting date must be a future date.</div>
+      <div class="section-label">Products</div>
+      <div class="product-grid">
+        <div class="product-btn" id="btn-jacket"   onclick="addProduct('Jacket')">       <span class="btn-name">Jacket</span></div>
+        <div class="product-btn" id="btn-trousers" onclick="addProduct('Trousers')">     <span class="btn-name">Trousers</span></div>
+        <div class="product-btn" id="btn-shirt"    onclick="addProduct('Shirt')">        <span class="btn-name">Shirt</span></div>
+        <div class="product-btn" id="btn-vest"     onclick="addProduct('Vest')">         <span class="btn-name">Vest</span></div>
+        <div class="product-btn" id="btn-safari"   onclick="addProduct('Safari Jacket')"><span class="btn-name">Safari Jacket</span></div>
+        <div class="product-btn" id="btn-overcoat" onclick="addProduct('Overcoat')">     <span class="btn-name">Overcoat</span></div>
+      </div>
+      <div id="fabric-fields-container"></div>
+      <div class="section-label">Remarks</div>
+      <textarea class="ref-input" id="remarks-input" placeholder="e.g. Baste Fitting; Fit Due 30/05/2026" rows="3" style="height:auto;padding:10px 16px;resize:vertical;line-height:1.5"></textarea>
     </div>
-    <div class="error-msg" id="duedate-error" style="display: none;">Due date must be a future date.</div>
-
-    <div class="section-label">Fitting Date</div>
-    <div style="display:flex;gap:8px;align-items:center">
-      <input class="ref-input" type="date" id="fittingdate-input" style="flex:1">
-      <button type="button" id="fittingdate-none-btn" onclick="toggleNoneDate('fittingdate')" style="height:var(--touch);padding:0 14px;border:1.5px solid var(--border-strong);border-radius:var(--radius-sm);background:var(--surface);font-family:'Helvetica Neue',sans-serif;font-size:13px;color:var(--text-muted);cursor:pointer;white-space:nowrap;flex-shrink:0;transition:background 0.15s,color 0.15s,border-color 0.15s" class="none-btn-active">None</button>
-    </div>
-    <div class="error-msg" id="fittingdate-error" style="display: none;">Fitting date must be a future date.</div>
-
-    <div class="section-label">Products</div>
-    <div class="product-grid">
-      <div class="product-btn" id="btn-jacket" onclick="addProduct('Jacket')">       <span class="btn-name">Jacket</span></div>
-      <div class="product-btn" id="btn-trousers" onclick="addProduct('Trousers')">     <span class="btn-name">Trousers</span></div>
-      <div class="product-btn" id="btn-shirt" onclick="addProduct('Shirt')">        <span class="btn-name">Shirt</span></div>
-      <div class="product-btn" id="btn-vest" onclick="addProduct('Vest')">         <span class="btn-name">Vest</span></div>
-      <div class="product-btn" id="btn-safari" onclick="addProduct('Safari Jacket')"><span class="btn-name">Safari Jacket</span></div>
-      <div class="product-btn" id="btn-overcoat" onclick="addProduct('Overcoat')">    <span class="btn-name">Overcoat</span></div>
-    </div>
-
-    <div id="fabric-fields-container"></div>
-
-    <div class="section-label">Remarks</div>
-    <textarea class="ref-input" id="remarks-input" placeholder="e.g. Baste Fitting; Fit Due 30/05/2026" rows="3" style="height:auto;padding:10px 16px;resize:vertical;line-height:1.5"></textarea>
-
-    </div><!-- end left-panel-scroll -->
     <div class="left-panel-footer">
-    <button class="submit-btn" onclick="submitOrder()">Submit Order →</button>
+      <button class="submit-btn" onclick="submitOrder()">Submit Order →</button>
     </div>
-
   </div>
 
-  <!-- RIGHT: Submitted Orders -->
   <div class="right-panel">
-    <!-- Tabs -->
     <div class="tab-bar">
-      <button class="tab-btn active" id="tab-orders" onclick="switchTab('orders')">Orders <span class="tab-badge" id="badge-orders">0</span></button>
-      <button class="tab-btn" id="tab-archive" onclick="switchTab('archive')">Archive <span class="tab-badge" id="badge-archive">0</span></button>
+      <button class="tab-btn active" id="tab-orders"  onclick="switchTab('orders')">Orders <span class="tab-badge" id="badge-orders">0</span></button>
+      <button class="tab-btn"        id="tab-archive" onclick="switchTab('archive')">Archive <span class="tab-badge" id="badge-archive">0</span></button>
     </div>
 
-    <!-- Orders tab content -->
-    <div id="pane-orders" style="">
+    <div id="pane-orders">
       <div class="search-wrap">
-        <input class="search-input" type="text" id="order-search" placeholder="Search by order no., fabric, lining or remarks…" oninput="renderOrders()" onkeypress="if(event.key==='Enter') renderOrders();" autocomplete="off">
+        <input class="search-input" type="text" id="order-search" placeholder="Search by order no., fabric, lining or remarks…" oninput="renderOrders()" onkeypress="if(event.key==='Enter')renderOrders();" autocomplete="off">
         <button class="search-clear-btn" id="search-clear" onclick="clearSearch()" style="display:none;">✕</button>
       </div>
       <div class="filter-bar">
         <span class="filter-label">Sort by</span>
-        <button class="sort-btn active" data-sort="default" id="sort-toggle" onclick="toggleSort()" title="Toggle sort order">Newest First</button>
+        <button class="sort-btn active" data-sort="default" onclick="toggleSort()">Newest First</button>
         <div class="filter-divider"></div>
         <span class="filter-label">Due Date</span>
-        <button class="sort-btn" data-sort="due-asc" id="sort-due-toggle" onclick="toggleDueSort()" title="Toggle due date sort">↑ Earliest</button>
+        <button class="sort-btn" data-sort="due-asc" onclick="toggleDueSort()">↑ Earliest</button>
         <div class="filter-divider"></div>
         <span class="filter-label">Fitting Date</span>
-        <button class="sort-btn" data-sort="fit-asc" id="sort-fit-toggle" onclick="toggleFitSort()" title="Toggle fitting date sort">↑ Earliest</button>
+        <button class="sort-btn" data-sort="fit-asc" onclick="toggleFitSort()">↑ Earliest</button>
       </div>
       <div class="filter-bar" style="margin-bottom:0.5rem">
         <span class="filter-label">Products</span>
-        <button class="sort-btn product-filter-btn" data-product="Jacket" onclick="toggleProductFilter('Jacket')">Jacket</button>
-        <button class="sort-btn product-filter-btn" data-product="Trousers" onclick="toggleProductFilter('Trousers')">Trousers</button>
-        <button class="sort-btn product-filter-btn" data-product="Shirt" onclick="toggleProductFilter('Shirt')">Shirt</button>
-        <button class="sort-btn product-filter-btn" data-product="Vest" onclick="toggleProductFilter('Vest')">Vest</button>
+        <button class="sort-btn product-filter-btn" data-product="Jacket"        onclick="toggleProductFilter('Jacket')">Jacket</button>
+        <button class="sort-btn product-filter-btn" data-product="Trousers"      onclick="toggleProductFilter('Trousers')">Trousers</button>
+        <button class="sort-btn product-filter-btn" data-product="Shirt"         onclick="toggleProductFilter('Shirt')">Shirt</button>
+        <button class="sort-btn product-filter-btn" data-product="Vest"          onclick="toggleProductFilter('Vest')">Vest</button>
         <button class="sort-btn product-filter-btn" data-product="Safari Jacket" onclick="toggleProductFilter('Safari Jacket')">Safari Jacket</button>
-        <button class="sort-btn product-filter-btn" data-product="Overcoat" onclick="toggleProductFilter('Overcoat')">Overcoat</button>
+        <button class="sort-btn product-filter-btn" data-product="Overcoat"      onclick="toggleProductFilter('Overcoat')">Overcoat</button>
       </div>
       <div class="filter-bar" style="margin-bottom:1rem">
         <span class="filter-label">Filter</span>
         <button class="sort-btn status-filter-btn" data-status="Fabric Ordered" id="filter-fabricordered" onclick="toggleStatusFilter('Fabric Ordered')">Fabric Ordered</button>
-        <button class="sort-btn status-filter-btn" data-status="Bin" id="filter-bin" onclick="toggleStatusFilter('Bin')">Bin</button>
-        <button class="sort-btn status-filter-btn" data-status="Delta" id="filter-delta" onclick="toggleStatusFilter('Delta')">Delta</button>
-        <button class="sort-btn status-filter-btn" data-status="Batam" id="filter-batam" onclick="toggleStatusFilter('Batam')">Batam</button>
-        <button class="sort-btn status-filter-btn" data-status="In-store" id="filter-instore" onclick="toggleStatusFilter('In-store')">In-Store</button>
+        <button class="sort-btn status-filter-btn" data-status="Bin"       id="filter-bin"      onclick="toggleStatusFilter('Bin')">Bin</button>
+        <button class="sort-btn status-filter-btn" data-status="Delta"     id="filter-delta"    onclick="toggleStatusFilter('Delta')">Delta</button>
+        <button class="sort-btn status-filter-btn" data-status="Batam"     id="filter-batam"    onclick="toggleStatusFilter('Batam')">Batam</button>
+        <button class="sort-btn status-filter-btn" data-status="In-store"  id="filter-instore"  onclick="toggleStatusFilter('In-store')">In-Store</button>
         <button class="sort-btn status-filter-btn" data-status="Take Home" id="filter-takehome" onclick="toggleStatusFilter('Take Home')">Take Home</button>
         <div class="filter-divider"></div>
-        <button class="sort-btn" id="filter-stuck" onclick="toggleStuckFilter()">Stuck</button>
+        <button class="sort-btn" id="filter-stuck"  onclick="toggleStuckFilter()">Stuck</button>
         <button class="sort-btn" id="filter-unpaid" onclick="toggleUnpaidFilter()">Unpaid</button>
-        <button class="sort-btn" id="filter-clear" onclick="clearStatusFilter()" style="display: none;">✕ Clear</button>
+        <button class="sort-btn" id="filter-clear"  onclick="clearStatusFilter()" style="display:none;">✕ Clear</button>
       </div>
       <div id="orders-content"></div>
     </div>
 
-    <!-- Archive tab content -->
-    <div id="pane-archive" style="display: none;">
+    <div id="pane-archive" style="display:none;">
       <div class="search-wrap">
-        <input class="search-input" type="text" id="archive-search" placeholder="Search archive by order no., fabric, lining or remarks…" oninput="renderArchive()" onkeypress="if(event.key==='Enter') renderArchive();" autocomplete="off">
+        <input class="search-input" type="text" id="archive-search" placeholder="Search archive by order no., fabric, lining or remarks…" oninput="renderArchive()" onkeypress="if(event.key==='Enter')renderArchive();" autocomplete="off">
         <button class="search-clear-btn" id="archive-search-clear" onclick="clearArchiveSearch()" style="display:none;">✕</button>
       </div>
       <div class="filter-bar">
         <span class="filter-label">Sort by</span>
-        <button class="sort-btn archive-sort-btn active" data-archive-sort="default" id="arc-sort-toggle" onclick="toggleArchiveSort()">Oldest First</button>
+        <button class="sort-btn active" data-archive-sort="default" onclick="toggleArchiveSort()">Oldest First</button>
         <div class="filter-divider"></div>
         <span class="filter-label">Due Date</span>
-        <button class="sort-btn archive-sort-btn" data-archive-sort="due-asc" id="arc-sort-due-toggle" onclick="toggleArchiveDueSort()">↑ Earliest</button>
+        <button class="sort-btn" data-archive-sort="due-asc" onclick="toggleArchiveDueSort()">↑ Earliest</button>
         <div class="filter-divider"></div>
         <span class="filter-label">Fitting Date</span>
-        <button class="sort-btn archive-sort-btn" data-archive-sort="fit-asc" id="arc-sort-fit-toggle" onclick="toggleArchiveFitSort()">↑ Earliest</button>
+        <button class="sort-btn" data-archive-sort="fit-asc" onclick="toggleArchiveFitSort()">↑ Earliest</button>
       </div>
       <div id="archive-content"></div>
     </div>
   </div>
-
 </div>
 
 <div class="toast" id="toast">Saved</div>
 
-<!-- Traffic Light Date Modal -->
 <div class="tl-modal-overlay" id="tl-modal">
   <div class="tl-modal">
     <div class="tl-modal-title" id="tl-modal-title">Record Date</div>
-    <div class="tl-modal-sub" id="tl-modal-sub">Enter the date for this status.</div>
+    <div class="tl-modal-sub"   id="tl-modal-sub">Enter the date for this status.</div>
     <label class="modal-label">Date</label>
     <input class="modal-input" type="date" id="tl-date-input" style="margin-bottom:16px">
     <div class="modal-footer" style="border-top:1px solid var(--border);padding-top:14px;display:flex;justify-content:flex-end;gap:10px">
@@ -354,19 +283,17 @@
   </div>
 </div>
 
-<!-- Delete Confirm Modal -->
 <div class="del-modal-overlay" id="del-modal">
   <div class="del-modal">
     <div class="del-modal-title">Delete Order?</div>
     <div class="del-modal-msg" id="del-modal-msg">Delete order?</div>
     <div class="del-modal-footer">
-      <button class="del-btn-cancel" onclick="closeDelModal()">Cancel</button>
-      <button class="del-btn-confirm" id="del-btn-yes" onclick="confirmDelete()">Delete</button>
+      <button class="del-btn-cancel"  onclick="closeDelModal()">Cancel</button>
+      <button class="del-btn-confirm" onclick="confirmDelete()">Delete</button>
     </div>
   </div>
 </div>
 
-<!-- Edit Modal -->
 <div class="modal-overlay" id="edit-modal">
   <div class="modal">
     <div class="modal-title">Edit Order</div>
@@ -394,796 +321,510 @@
 </div>
 
 <script>
-  // ==========================================
-  // CONFIGURATION API & SYNC FUNCTION
-  // ==========================================
-  const API_URL = 'https://script.google.com/macros/s/AKfycbxi5HqcfmXs2FUdt9WcrSFjSUXNAeylfdU1YUH1KUoLIxxPLuv0PGkC6hQiHq2V0g_J/exec'; 
+  // ── API ──
+  const API_URL = 'https://script.google.com/macros/s/AKfycbxi5HqcfmXs2FUdt9WcrSFjSUXNAeylfdU1YUH1KUoLIxxPLuv0PGkC6hQiHq2V0g_J/exec';
 
-  async function syncToServer(orderData, isDelete = false) {
-    showToast(isDelete ? 'Deleting...' : 'Saving...');
-    // Save to localStorage first (offline support)
-    saveToLocalStorage();
-    
-    try {
-      const payload = isDelete ? { action: 'DELETE', orderNum: orderData.orderNum } : orderData;
-      const response = await fetch(API_URL, {
-        method: 'POST',
-        body: JSON.stringify(payload),
-        headers: { 'Content-Type': 'text/plain;charset=utf-8' }
-      });
-      const result = await response.json();
-      if(result.status === 'success') {
-        showToast(isDelete ? '✓ Deleted' : '✓ Saved');
-      } else {
-        showToast('⚠️ Local save only (API error)');
-      }
-    } catch (error) {
-      console.error('Sync error:', error);
-      showToast('✓ Saved locally (offline)');
-      // Data sudah tersimpan di localStorage
+  // ── CONSTANTS ──
+  var PRODUCTS     = ['Jacket','Trousers','Shirt','Vest','Safari Jacket','Overcoat'];
+  var PRODUCT_IDS  = {'Jacket':'jacket','Trousers':'trousers','Shirt':'shirt','Vest':'vest','Safari Jacket':'safari','Overcoat':'overcoat'};
+  var NEEDS_LINING = ['Jacket','Vest','Overcoat'];
+  var STATUS_STATES_NO_DELTA = ['','Fabric Ordered','Bin','Batam','In-store','Take Home'];
+  var STATUS_STATES_NO_BATAM = ['','Fabric Ordered','Bin','Delta','In-store','Take Home'];
+  var NO_DELTA_PRODUCTS = ['Jacket','Overcoat','Vest','Safari Jacket'];
+  var NO_BATAM_PRODUCTS = ['Shirt','Trousers'];
+  var TL_LABELS = ['','Baste Fitting','Fitting','Final / Take Home'];
+  var TL_COLORS = ['','red','amber','green'];
+
+  // ── STATE ──
+  var selectedItems = [], orders = [], archivedOrders = [];
+  var currentSort = 'default', currentArchiveSort = 'default', currentTab = 'orders';
+  var activeStatusFilter = null, activeStuckFilter = false, activeUnpaidFilter = false, activeProductFilters = {};
+  var editIdx = -1, delPendingType = '', delPendingOi = -1, delPendingIi = -1;
+  var tlPendingOi = -1, tlPendingNext = 0, tlEditingExisting = false;
+
+  // ── DATE HELPERS ──
+  // parseToYMD: converts ANY date format → 'yyyy-MM-dd' string
+  function parseToYMD(val) {
+    if (!val) return '';
+    var s = String(val).trim();
+    if (/^\d{4}-\d{2}-\d{2}$/.test(s)) return s;                   // already yyyy-MM-dd
+    if (/^\d{4}-\d{2}-\d{2}T/.test(s)) return s.substring(0, 10);  // ISO with time
+    var d = new Date(s);                                              // try any other format (e.g. "Mon Apr 27 2026...")
+    if (!isNaN(d.getTime())) {
+      return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
     }
+    return '';
+  }
+
+  // formatDisplayDate: converts any date value → "9 May 2026"
+  function formatDisplayDate(val) {
+    if (!val) return '—';
+    var ymd = parseToYMD(val);
+    if (!ymd) return '—';
+    var p = ymd.split('-');
+    var M = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+    return parseInt(p[2],10) + ' ' + M[parseInt(p[1],10)-1] + ' ' + p[0];
+  }
+
+  function isDueSoon(val) {
+    if (!val) return false;
+    var ymd = parseToYMD(val); if (!ymd) return false;
+    var d = new Date(ymd), n = new Date(); n.setHours(0,0,0,0);
+    var diff = (d-n)/86400000; return diff >= 0 && diff <= 3;
+  }
+
+  // Normalize order dates on load
+  function normalizeOrder(o) {
+    o.orderNum    = String(o.orderNum || '').trim();
+    o.date        = parseToYMD(o.date);
+    o.dueDate     = parseToYMD(o.dueDate);
+    o.fittingDate = parseToYMD(o.fittingDate);
+    return o;
+  }
+
+  // ── API SYNC ──
+  async function syncToServer(orderData, isDelete) {
+    isDelete = isDelete || false;
+    showToast(isDelete ? 'Deleting...' : 'Saving...');
+    saveToLocalStorage();
+    try {
+      var payload = isDelete ? {action:'DELETE', orderNum: orderData.orderNum} : orderData;
+      var r = await fetch(API_URL, {method:'POST', body:JSON.stringify(payload), headers:{'Content-Type':'text/plain;charset=utf-8'}});
+      var result = await r.json();
+      showToast(result.status==='success' ? (isDelete?'✓ Deleted':'✓ Saved') : '⚠️ Local save only (API error)');
+    } catch(err) { console.error('Sync error:',err); showToast('✓ Saved locally (offline)'); }
   }
 
   async function fetchOrdersFromServer() {
     var btn = document.getElementById('save-fab');
     if (btn) btn.textContent = '⏳ Syncing...';
     try {
-      const response = await fetch(API_URL);
-      const result = await response.json();
-      if(result.status === 'success') {
-        orders = [];
-        archivedOrders = [];
-        var data = result.data || [];
-        data.forEach(function(o) {
-          // Pastikan orderNum selalu string
-          o.orderNum = String(o.orderNum || '').trim();
-          if(o.archived) {
-            archivedOrders.push(o);
-          } else {
-            orders.push(o);
-          }
+      var r = await fetch(API_URL);
+      var result = await r.json();
+      if (result.status === 'success') {
+        orders = []; archivedOrders = [];
+        (result.data || []).forEach(function(o) {
+          normalizeOrder(o);
+          if (o.archived) archivedOrders.push(o); else orders.push(o);
         });
-        
-        // Render kedua tab — search term tetap terbaca dari DOM input
-        renderOrders();
-        renderArchive();
-        
+        renderOrders(); renderArchive();
         if (btn) btn.textContent = '🔄 Refresh';
         showToast('✓ Data loaded');
         saveToLocalStorage();
-      }
-    } catch (error) {
-      console.error('Fetch error:', error);
-      showToast('⚠️ Failed to load - Check API URL or connection');
+      } else { throw new Error('API error'); }
+    } catch(err) {
+      console.error('Fetch error:',err);
+      showToast('⚠️ Failed to load — using cached data');
       if (btn) btn.textContent = '❌ Sync Failed';
       loadFromLocalStorage();
     }
   }
-  
+
   function loadFromLocalStorage() {
     try {
       var saved = localStorage.getItem('sakal-orders');
-      if(saved) {
+      if (saved) {
         var data = JSON.parse(saved);
-        orders = (data.orders || []).map(function(o){ o.orderNum = String(o.orderNum||'').trim(); return o; });
-        archivedOrders = (data.archived || []).map(function(o){ o.orderNum = String(o.orderNum||'').trim(); return o; });
-        renderOrders();
-        renderArchive();
+        orders         = (data.orders   || []).map(normalizeOrder);
+        archivedOrders = (data.archived || []).map(normalizeOrder);
         showToast('📦 Loaded from cache (offline mode)');
-      } else {
-        renderOrders();
-        renderArchive();
       }
-    } catch (e) {
-      console.log('Cache error:', e);
-      renderOrders();
-      renderArchive();
-    }
-  }
-  
-  function saveToLocalStorage() {
-    try {
-      var data = {
-        orders: orders,
-        archived: archivedOrders,
-        lastSaved: new Date().toISOString()
-      };
-      localStorage.setItem('sakal-orders', JSON.stringify(data));
-    } catch (e) {
-      console.log('Cannot save to localStorage');
-    }
+    } catch(e) { console.log('Cache error:',e); }
+    renderOrders(); renderArchive();
   }
 
+  function saveToLocalStorage() {
+    try { localStorage.setItem('sakal-orders', JSON.stringify({orders:orders, archived:archivedOrders, lastSaved:new Date().toISOString()})); }
+    catch(e) { console.log('Cannot save to localStorage'); }
+  }
+
+  // ── INIT ──
   window.onload = function() {
     fetchOrdersFromServer();
-    // Fallback: jika setelah 2 detik data masih kosong, load dari cache
     setTimeout(function() {
-      if (orders.length === 0 && archivedOrders.length === 0) {
-        loadFromLocalStorage();
-      }
-      updateSortButtons();
-      updateArchiveSortButtons();
-      updateProductFilterButtons();
-    }, 2000);
+      if (orders.length === 0 && archivedOrders.length === 0) loadFromLocalStorage();
+      updateSortButtons(); updateArchiveSortButtons(); updateProductFilterButtons();
+    }, 3000);
   };
-  // Auto-refresh hanya saat window focus DAN tidak ada search aktif
+
+  // Auto-refresh on focus — skip if user is actively searching
   window.addEventListener('focus', function() {
-    var oSearch = document.getElementById('order-search');
-    var aSearch = document.getElementById('archive-search');
-    var hasSearch = (oSearch && oSearch.value.trim()) || (aSearch && aSearch.value.trim());
-    if (!hasSearch) fetchOrdersFromServer();
+    var oS = document.getElementById('order-search'), aS = document.getElementById('archive-search');
+    if (!((oS && oS.value.trim()) || (aS && aS.value.trim()))) fetchOrdersFromServer();
   });
 
-  // ==========================================
-  // VARIABLES & DATA
-  // ==========================================
-  var PRODUCTS    = ['Jacket','Trousers','Shirt','Vest','Safari Jacket','Overcoat'];
-  var PRODUCT_IDS = { 'Jacket':'jacket','Trousers':'trousers','Shirt':'shirt','Vest':'vest','Safari Jacket':'safari','Overcoat':'overcoat' };
-  var NEEDS_LINING = ['Jacket','Vest','Overcoat'];
-  var STATUS_STATES_NO_DELTA  = ['','Fabric Ordered','Bin','Batam','In-store','Take Home'];
-  var STATUS_STATES_NO_BATAM  = ['','Fabric Ordered','Bin','Delta','In-store','Take Home'];
-  var NO_DELTA_PRODUCTS = ['Jacket','Overcoat','Vest','Safari Jacket'];
-  var NO_BATAM_PRODUCTS = ['Shirt','Trousers'];
-
-  function getStatusStates(product) {
-    if (NO_DELTA_PRODUCTS.indexOf(product) !== -1) return STATUS_STATES_NO_DELTA;
-    if (NO_BATAM_PRODUCTS.indexOf(product) !== -1) return STATUS_STATES_NO_BATAM;
-    return ['','Fabric Ordered','Bin','Batam','Delta','In-store','Take Home'];
-  }
-
-  var selectedItems = [];
-  var orders = [];         // EMPTY (CLEAN SLATE)
-  var archivedOrders = []; // EMPTY (CLEAN SLATE)
-  
-  var currentSort = 'default';
-  var activeStatusFilter = null;
-  var activeStuckFilter  = false;
-  var activeUnpaidFilter = false;
-  var activeProductFilters = {};
-  var currentTab = 'orders';
-  var currentArchiveSort = 'default';
-
-  // ==========================================
-  // TABS & UI LOGIC
-  // ==========================================
+  // ── TABS ──
   function switchTab(tab) {
     currentTab = tab;
     document.getElementById('pane-orders').style.display  = tab === 'orders'  ? '' : 'none';
     document.getElementById('pane-archive').style.display = tab === 'archive' ? '' : 'none';
     document.getElementById('tab-orders').classList.toggle('active',  tab === 'orders');
     document.getElementById('tab-archive').classList.toggle('active', tab === 'archive');
-    if (tab === 'archive') renderArchive();
-    else renderOrders();
+    if (tab === 'archive') renderArchive(); else renderOrders();
   }
 
   function updateBadges() {
     var today = new Date(); today.setHours(0,0,0,0);
-    var activeCount = orders.filter(function(o) {
-      var allTakeHome = (o.items||[]).length > 0 && (o.items||[]).every(function(it){ return it.status === 'Take Home'; });
-      if (allTakeHome) {
-        var ref = o.dueDate || o.fittingDate;
-        if (ref && new Date(ref) < today) return false;
-      }
+    var active = orders.filter(function(o) {
+      var allDone = (o.items||[]).length > 0 && (o.items||[]).every(function(it){ return it.status==='Take Home'; });
+      if (allDone) { var ref = o.dueDate||o.fittingDate; if (ref && new Date(ref) < today) return false; }
       return true;
     }).length;
-    document.getElementById('badge-orders').textContent  = activeCount;
+    document.getElementById('badge-orders').textContent  = active;
     document.getElementById('badge-archive').textContent = archivedOrders.length;
   }
 
-  // ==========================================
-  // FORM & INPUT LOGIC
-  // ==========================================
+  // ── FORM ──
+  function getStatusStates(p) {
+    if (NO_DELTA_PRODUCTS.indexOf(p) !== -1) return STATUS_STATES_NO_DELTA;
+    if (NO_BATAM_PRODUCTS.indexOf(p) !== -1) return STATUS_STATES_NO_BATAM;
+    return ['','Fabric Ordered','Bin','Batam','Delta','In-store','Take Home'];
+  }
   function needsLining(p) { return NEEDS_LINING.indexOf(p) !== -1; }
-
-  function addProduct(name) {
-    selectedItems.push({ product: name, fabric: '', lining: '' });
-    renderFabricFields();
-    updateProductButtons();
-  }
-
-  function removeItem(idx) {
-    syncFabrics();
-    selectedItems.splice(idx, 1);
-    renderFabricFields();
-    updateProductButtons();
-  }
-
+  function addProduct(name) { selectedItems.push({product:name, fabric:'', lining:''}); renderFabricFields(); updateProductButtons(); }
+  function removeItem(idx)  { syncFabrics(); selectedItems.splice(idx,1); renderFabricFields(); updateProductButtons(); }
   function syncFabrics() {
-    selectedItems.forEach(function(item, i) {
-      var fab = document.getElementById('fabric-input-' + i);
-      if (fab) item.fabric = fab.value;
-      var lin = document.getElementById('lining-input-' + i);
-      if (lin) item.lining = lin.value;
+    selectedItems.forEach(function(item,i) {
+      var f=document.getElementById('fabric-input-'+i); if(f) item.fabric=f.value;
+      var l=document.getElementById('lining-input-'+i); if(l) item.lining=l.value;
     });
   }
-
   function updateProductButtons() {
     var counts = {};
-    selectedItems.forEach(function(item) { counts[item.product] = (counts[item.product] || 0) + 1; });
+    selectedItems.forEach(function(item){ counts[item.product]=(counts[item.product]||0)+1; });
     PRODUCTS.forEach(function(p) {
-      var id = 'btn-' + PRODUCT_IDS[p];
-      var btn = document.getElementById(id);
-      var count = counts[p] || 0;
-      btn.classList.toggle('selected', count > 0);
-      var nameSpan = btn.querySelector('.btn-name');
-      nameSpan.textContent = count > 1 ? p + ' ×' + count : p;
+      var btn=document.getElementById('btn-'+PRODUCT_IDS[p]), count=counts[p]||0;
+      btn.classList.toggle('selected', count>0);
+      btn.querySelector('.btn-name').textContent = count>1 ? p+' ×'+count : p;
     });
   }
-
   function renderFabricFields() {
     syncFabrics();
-    var container = document.getElementById('fabric-fields-container');
-    if (selectedItems.length === 0) { container.innerHTML = ''; return; }
-
+    var c = document.getElementById('fabric-fields-container');
+    if (selectedItems.length === 0) { c.innerHTML=''; return; }
     var html = '<div class="section-label" style="margin-top:1.1rem">Fabric &amp; Lining</div><div class="fabric-fields">';
-    selectedItems.forEach(function(item, i) {
-      var hasLining = needsLining(item.product);
-      html += '<div class="fabric-card">'
-        + '<div class="fabric-card-header">'
-        + '<span class="fabric-card-title">' + esc(item.product) + '</span>'
-        + '<div class="remove-item-btn" onclick="removeItem(' + i + ')" title="Remove">✕</div>'
-        + '</div>'
-        + '<div class="fabric-row">'
-        + '<label>Fabric</label>'
-        + '<input type="text" id="fabric-input-' + i + '" placeholder="Fabric No. *" value="' + esc(item.fabric) + '" oninput="onFabricInput()" style="' + (item.fabric ? '' : 'border-color:#e0913a') + '">'
-        + '</div>'
-        + (hasLining
-          ? '<div class="fabric-row"><label>Lining</label>'
-          + '<input type="text" id="lining-input-' + i + '" placeholder="Lining No. *" value="' + esc(item.lining||'') + '" oninput="onFabricInput()" style="' + (!item.lining ? 'border-color:#e0913a' : '') + '">'
-          + '</div>' : '')
+    selectedItems.forEach(function(item,i) {
+      html += '<div class="fabric-card"><div class="fabric-card-header"><span class="fabric-card-title">'+esc(item.product)+'</span><div class="remove-item-btn" onclick="removeItem('+i+')">✕</div></div>'
+        + '<div class="fabric-row"><label>Fabric</label><input type="text" id="fabric-input-'+i+'" placeholder="Fabric No. *" value="'+esc(item.fabric)+'" oninput="onFabricInput()" style="'+(item.fabric?'':'border-color:#e0913a')+'"></div>'
+        + (needsLining(item.product) ? '<div class="fabric-row"><label>Lining</label><input type="text" id="lining-input-'+i+'" placeholder="Lining No. *" value="'+esc(item.lining||'')+'" oninput="onFabricInput()" style="'+(!item.lining?'border-color:#e0913a':'')+'"></div>' : '')
         + '</div>';
     });
-    html += '</div>';
-    container.innerHTML = html;
+    c.innerHTML = html + '</div>';
   }
-
   function onFabricInput() {
     syncFabrics();
-    selectedItems.forEach(function(item, i) {
-      var fab = document.getElementById('fabric-input-' + i);
-      if (fab) fab.style.borderColor = fab.value ? '' : '#e0913a';
-      var lin = document.getElementById('lining-input-' + i);
-      if (lin && needsLining(item.product)) lin.style.borderColor = lin.value ? '' : '#e0913a';
+    selectedItems.forEach(function(item,i) {
+      var f=document.getElementById('fabric-input-'+i); if(f) f.style.borderColor=f.value?'':'#e0913a';
+      var l=document.getElementById('lining-input-'+i); if(l&&needsLining(item.product)) l.style.borderColor=l.value?'':'#e0913a';
     });
   }
-
-  // ==========================================
-  // CORE FUNCTIONS
-  // ==========================================
   function submitOrder() {
-    var orderNum = document.getElementById('ordernum-input').value.trim();
-    var dueDate  = document.getElementById('duedate-input').value;
-    var fittingDate = document.getElementById('fittingdate-input').value;
-
-    var errNum = document.getElementById('ordernum-error');
-    errNum.style.display = 'none';
-
-    if (!orderNum) { errNum.style.display = 'block'; return; }
-    if (selectedItems.length === 0) { showToast('Please select at least one product'); return; }
-
+    var orderNum=document.getElementById('ordernum-input').value.trim();
+    var dueDate=document.getElementById('duedate-input').value;
+    var fittingDate=document.getElementById('fittingdate-input').value;
+    var errNum=document.getElementById('ordernum-error'); errNum.style.display='none';
+    if (!orderNum) { errNum.style.display='block'; return; }
+    if (selectedItems.length===0) { showToast('Please select at least one product'); return; }
     syncFabrics();
-    var missingFabric  = selectedItems.some(function(item) { return !item.fabric.trim(); });
-    var missingLining  = selectedItems.some(function(item) { return needsLining(item.product) && !item.lining.trim(); });
-    if (missingFabric || missingLining) { showToast('Please fill in all required fabric/lining fields'); onFabricInput(); return; }
-
-    var remarks = document.getElementById('remarks-input').value.trim();
-    var dateStr = new Date().toLocaleDateString('en-SG', { day: '2-digit', month: 'short', year: 'numeric' });
-
-    var newItems = selectedItems.map(function(item) {
-      return { product: item.product, fabric: item.fabric, lining: item.lining, status: '', paid: false, invoice: false, stuck: false };
-    });
-
-    var newOrder = { 
-      orderNum: orderNum, 
-      dueDate: dueDate, 
-      fittingDate: fittingDate, 
-      items: newItems, 
-      date: dateStr, 
-      fitted: 0, 
-      remarks: remarks,
-      archived: false 
-    };
-
+    if (selectedItems.some(function(i){ return !i.fabric.trim(); }) || selectedItems.some(function(i){ return needsLining(i.product)&&!i.lining.trim(); })) {
+      showToast('Please fill in all required fabric/lining fields'); onFabricInput(); return;
+    }
+    var remarks=document.getElementById('remarks-input').value.trim();
+    var today=new Date();
+    var dateStr=today.getFullYear()+'-'+String(today.getMonth()+1).padStart(2,'0')+'-'+String(today.getDate()).padStart(2,'0');
+    var newItems=selectedItems.map(function(item){ return {product:item.product,fabric:item.fabric,lining:item.lining,status:'',paid:false,invoice:false,stuck:false}; });
+    var newOrder={orderNum:orderNum,dueDate:dueDate,fittingDate:fittingDate,items:newItems,date:dateStr,fitted:0,remarks:remarks,archived:false};
     orders.unshift(newOrder);
-
-    showToast('Order ' + orderNum + ' submitted');
-    document.getElementById('remarks-input').value = '';
-    document.getElementById('ordernum-input').value = '';
-    document.getElementById('fittingdate-input').value = '';
-    document.getElementById('duedate-input').value = '';
-    selectedItems = [];
-    renderFabricFields();
-    updateProductButtons();
-    renderOrders();
-    
-    syncToServer(newOrder); // Sync to DB
+    showToast('Order '+orderNum+' submitted');
+    ['ordernum-input','remarks-input','fittingdate-input','duedate-input'].forEach(function(id){ document.getElementById(id).value=''; });
+    selectedItems=[]; renderFabricFields(); updateProductButtons(); renderOrders();
+    syncToServer(newOrder);
   }
 
-  // ==========================================
-  // DELETE & ARCHIVE LOGIC
-  // ==========================================
-  var delPendingType = ''; 
-  var delPendingOi = -1;
-  var delPendingIi = -1;
-
-  function deleteOrder(idx) {
-    delPendingType = 'order'; delPendingOi = idx;
-    document.getElementById('del-modal-msg').textContent = 'Delete order ' + orders[idx].orderNum + '? This cannot be undone.';
+  // ── DELETE & ARCHIVE ──
+  function deleteOrder(idx) { delPendingType='order'; delPendingOi=idx; document.getElementById('del-modal-msg').textContent='Delete order '+orders[idx].orderNum+'? This cannot be undone.'; document.getElementById('del-modal').classList.add('open'); }
+  function deleteArchiveOrder(ai) { delPendingType='archive'; delPendingOi=ai; document.getElementById('del-modal-msg').textContent='Permanently delete archived order '+archivedOrders[ai].orderNum+'?'; document.getElementById('del-modal').classList.add('open'); }
+  function deleteItem(oi,ii) {
+    delPendingType='item'; delPendingOi=oi; delPendingIi=ii; var o=orders[oi];
+    document.getElementById('del-modal-msg').textContent = o.items.length===1 ? 'Delete '+o.items[ii].product+' from order '+o.orderNum+'? Entire order will be removed.' : 'Delete '+o.items[ii].product+'?';
     document.getElementById('del-modal').classList.add('open');
   }
-  function deleteArchiveOrder(ai) {
-    delPendingType = 'archive'; delPendingOi = ai;
-    document.getElementById('del-modal-msg').textContent = 'Permanently delete archived order ' + archivedOrders[ai].orderNum + '?';
-    document.getElementById('del-modal').classList.add('open');
-  }
-  function deleteItem(oi, ii) {
-    delPendingType = 'item'; delPendingOi = oi; delPendingIi = ii;
-    var o = orders[oi];
-    var msg = o.items.length === 1 ? 'Delete ' + o.items[ii].product + ' from order ' + o.orderNum + '? Entire order will be removed.' : 'Delete ' + o.items[ii].product + '?';
-    document.getElementById('del-modal-msg').textContent = msg;
-    document.getElementById('del-modal').classList.add('open');
-  }
-  function closeDelModal() {
-    document.getElementById('del-modal').classList.remove('open');
-    delPendingType = ''; delPendingOi = -1; delPendingIi = -1;
-  }
+  function closeDelModal() { document.getElementById('del-modal').classList.remove('open'); delPendingType=''; delPendingOi=-1; delPendingIi=-1; }
   function confirmDelete() {
-    if (delPendingType === 'order') {
-      var o = orders[delPendingOi];
-      orders.splice(delPendingOi, 1);
-      syncToServer(o, true);
+    if (delPendingType==='order') { var o=orders[delPendingOi]; orders.splice(delPendingOi,1); syncToServer(o,true); closeDelModal(); renderOrders(); }
+    else if (delPendingType==='item') {
+      var o=orders[delPendingOi];
+      if (o.items.length===1) { orders.splice(delPendingOi,1); syncToServer(o,true); } else { o.items.splice(delPendingIi,1); syncToServer(o); }
       closeDelModal(); renderOrders();
-    } else if (delPendingType === 'item') {
-      var o = orders[delPendingOi];
-      if (o.items.length === 1) {
-        orders.splice(delPendingOi, 1);
-        syncToServer(o, true);
-      } else {
-        o.items.splice(delPendingIi, 1);
-        syncToServer(o);
-      }
-      closeDelModal(); renderOrders();
-    } else if (delPendingType === 'archive') {
-      var o = archivedOrders[delPendingOi];
-      archivedOrders.splice(delPendingOi, 1);
-      syncToServer(o, true);
-      closeDelModal(); renderArchive();
-    }
+    } else if (delPendingType==='archive') { var o=archivedOrders[delPendingOi]; archivedOrders.splice(delPendingOi,1); syncToServer(o,true); closeDelModal(); renderArchive(); }
   }
+  function archiveOrder(idx) { var o=orders[idx]; o.archived=true; archivedOrders.unshift(o); orders.splice(idx,1); renderOrders(); renderArchive(); updateBadges(); syncToServer(o); showToast('Order '+o.orderNum+' archived'); }
+  function restoreOrder(ai)  { var o=archivedOrders[ai]; o.archived=false; orders.unshift(o); archivedOrders.splice(ai,1); renderOrders(); renderArchive(); updateBadges(); syncToServer(o); showToast('Order '+o.orderNum+' restored'); }
 
-  function archiveOrder(idx) {
-    var o = orders[idx];
-    o.archived = true;
-    archivedOrders.unshift(o);
-    orders.splice(idx, 1);
-    renderOrders(); renderArchive(); updateBadges();
-    syncToServer(o);
-    showToast('Order ' + o.orderNum + ' archived');
-  }
-  function restoreOrder(ai) {
-    var o = archivedOrders[ai];
-    o.archived = false;
-    orders.unshift(o);
-    archivedOrders.splice(ai, 1);
-    renderOrders(); renderArchive(); updateBadges();
-    syncToServer(o);
-    showToast('Order ' + o.orderNum + ' restored');
-  }
-
-  // ==========================================
-  // STATUS & MODALS LOGIC
-  // ==========================================
-  function toggleItemStatus(oi, ii, field) {
-    var item = orders[oi].items[ii];
-    if (field === 'status') {
-      var states = getStatusStates(item.product);
-      var cur = states.indexOf(item.status);
-      item.status = states[cur === -1 ? 0 : (cur + 1) % states.length];
-    } else {
-      item[field] = !item[field];
-    }
-    renderOrders();
-    syncToServer(orders[oi]);
-  }
-  function toggleArchiveItemPaid(ai, ii) {
-    archivedOrders[ai].items[ii].paid = !archivedOrders[ai].items[ii].paid;
-    renderArchive();
-    syncToServer(archivedOrders[ai]);
-  }
-
-  var tlPendingOi = -1;
-  var tlPendingNext = 0;
-  var tlEditingExisting = false;
-  var TL_LABELS = ['', 'Baste Fitting', 'Fitting', 'Final / Take Home'];
-  var TL_COLORS = ['', 'red', 'amber', 'green'];
-
-  function toggleOrderFitted(oi) {
-    var current = orders[oi].fitted || 0;
-    var next = (current + 1) % 4;
-    if (next === 0) { orders[oi].fitted = 0; renderOrders(); syncToServer(orders[oi]); return; }
-    tlPendingOi = oi; tlPendingNext = next; tlEditingExisting = false;
-    document.getElementById('tl-modal-title').innerHTML = '<span class="tl-dot-preview ' + TL_COLORS[next] + '"></span>' + TL_LABELS[next];
-    document.getElementById('tl-modal-sub').textContent = 'Enter date for order ' + orders[oi].orderNum + '.';
-    var today = new Date(); var iso = today.getFullYear() + '-' + String(today.getMonth()+1).padStart(2,'0') + '-' + String(today.getDate()).padStart(2,'0');
-    document.getElementById('tl-date-input').value = iso;
-    document.getElementById('tl-modal').classList.add('open');
-  }
-  function closeTlModal() { document.getElementById('tl-modal').classList.remove('open'); tlPendingOi = -1; }
-  function saveTlModal() {
-    if (tlPendingOi < 0) return;
-    var dateVal = document.getElementById('tl-date-input').value;
-    if (!dateVal) { showToast('Please enter a date'); return; }
-    if (!tlEditingExisting) orders[tlPendingOi].fitted = tlPendingNext;
-    if (!orders[tlPendingOi].fittedDates) orders[tlPendingOi].fittedDates = {};
-    orders[tlPendingOi].fittedDates[tlPendingNext] = dateVal;
-    closeTlModal(); renderOrders(); 
-    syncToServer(orders[tlPendingOi]);
-  }
-  function deleteTlDot(oi, level) {
-    if (!orders[oi].fittedDates) orders[oi].fittedDates = {};
-    for (var l = level; l <= 3; l++) delete orders[oi].fittedDates[l];
-    orders[oi].fitted = level - 1;
+  // ── STATUS & MODALS ──
+  function toggleItemStatus(oi,ii,field) {
+    var item=orders[oi].items[ii];
+    if (field==='status') { var states=getStatusStates(item.product),cur=states.indexOf(item.status); item.status=states[cur===-1?0:(cur+1)%states.length]; }
+    else { item[field]=!item[field]; }
     renderOrders(); syncToServer(orders[oi]);
   }
-  function editTlDate(oi, level) {
-    tlPendingOi = oi; tlPendingNext = level; tlEditingExisting = true;
-    document.getElementById('tl-modal-title').innerHTML = '<span class="tl-dot-preview ' + TL_COLORS[level] + '"></span>' + esc(TL_LABELS[level]);
-    document.getElementById('tl-date-input').value = (orders[oi].fittedDates || {})[level] || '';
+  function toggleArchiveItemPaid(ai,ii) { archivedOrders[ai].items[ii].paid=!archivedOrders[ai].items[ii].paid; renderArchive(); syncToServer(archivedOrders[ai]); }
+
+  function toggleOrderFitted(oi) {
+    var current=orders[oi].fitted||0, next=(current+1)%4;
+    if (next===0) { orders[oi].fitted=0; renderOrders(); syncToServer(orders[oi]); return; }
+    tlPendingOi=oi; tlPendingNext=next; tlEditingExisting=false;
+    document.getElementById('tl-modal-title').innerHTML='<span class="tl-dot-preview '+TL_COLORS[next]+'"></span>'+TL_LABELS[next];
+    document.getElementById('tl-modal-sub').textContent='Enter date for order '+orders[oi].orderNum+'.';
+    var t=new Date(); document.getElementById('tl-date-input').value=t.getFullYear()+'-'+String(t.getMonth()+1).padStart(2,'0')+'-'+String(t.getDate()).padStart(2,'0');
     document.getElementById('tl-modal').classList.add('open');
   }
-
-  function saveInlineDate(idx, type, picker) {
-    if (type === 'due') { orders[idx].dueDate = picker.value; } 
-    else { orders[idx].fittingDate = picker.value; }
-    renderOrders(); 
-    syncToServer(orders[idx]);
+  function closeTlModal() { document.getElementById('tl-modal').classList.remove('open'); tlPendingOi=-1; }
+  function saveTlModal() {
+    if (tlPendingOi<0) return;
+    var dateVal=document.getElementById('tl-date-input').value;
+    if (!dateVal) { showToast('Please enter a date'); return; }
+    if (!tlEditingExisting) orders[tlPendingOi].fitted=tlPendingNext;
+    if (!orders[tlPendingOi].fittedDates) orders[tlPendingOi].fittedDates={};
+    orders[tlPendingOi].fittedDates[tlPendingNext]=dateVal;
+    closeTlModal(); renderOrders(); syncToServer(orders[tlPendingOi]);
   }
-  function cancelInlineDate() { setTimeout(function() { renderOrders(); }, 150); }
-  function cancelFittingDate() { setTimeout(function() { renderOrders(); }, 150); }
-  function openInlineDatePicker(idx, cell) { cell.querySelector('.due-date-display').style.display='none'; var p=cell.querySelector('.due-date-picker'); p.style.display='inline-block'; p.focus(); try{p.showPicker()}catch(e){} }
-  function openFittingDatePicker(idx, cell) { cell.querySelector('.fitting-date-display').style.display='none'; var p=cell.querySelector('.fitting-date-picker'); p.style.display='inline-block'; p.focus(); try{p.showPicker()}catch(e){} }
+  function deleteTlDot(oi,level) {
+    if (!orders[oi].fittedDates) orders[oi].fittedDates={};
+    for (var l=level;l<=3;l++) delete orders[oi].fittedDates[l];
+    orders[oi].fitted=level-1; renderOrders(); syncToServer(orders[oi]);
+  }
+  function editTlDate(oi,level) {
+    tlPendingOi=oi; tlPendingNext=level; tlEditingExisting=true;
+    document.getElementById('tl-modal-title').innerHTML='<span class="tl-dot-preview '+TL_COLORS[level]+'"></span>'+esc(TL_LABELS[level]);
+    document.getElementById('tl-date-input').value=(orders[oi].fittedDates||{})[level]||'';
+    document.getElementById('tl-modal').classList.add('open');
+  }
+  function saveInlineDate(idx,type,picker) { if(type==='due') orders[idx].dueDate=picker.value; else orders[idx].fittingDate=picker.value; renderOrders(); syncToServer(orders[idx]); }
+  function cancelInlineDate()  { setTimeout(function(){ renderOrders(); },150); }
+  function cancelFittingDate() { setTimeout(function(){ renderOrders(); },150); }
+  function openInlineDatePicker(idx,cell)  { cell.querySelector('.due-date-display').style.display='none'; var p=cell.querySelector('.due-date-picker'); p.style.display='inline-block'; p.focus(); try{p.showPicker();}catch(e){} }
+  function openFittingDatePicker(idx,cell) { cell.querySelector('.fitting-date-display').style.display='none'; var p=cell.querySelector('.fitting-date-picker'); p.style.display='inline-block'; p.focus(); try{p.showPicker();}catch(e){} }
 
-  var editIdx = -1;
   function openEditModal(idx) {
-    editIdx = idx; var o = orders[idx];
-    document.getElementById('modal-ordernum').value = o.orderNum;
-    document.getElementById('modal-duedate').value = o.dueDate || '';
-    document.getElementById('modal-fittingdate').value = o.fittingDate || '';
-    document.getElementById('modal-remarks').value = o.remarks || '';
-    renderModalItems(o.items || []);
+    editIdx=idx; var o=orders[idx];
+    document.getElementById('modal-ordernum').value=o.orderNum;
+    document.getElementById('modal-duedate').value=o.dueDate||'';
+    document.getElementById('modal-fittingdate').value=o.fittingDate||'';
+    document.getElementById('modal-remarks').value=o.remarks||'';
+    renderModalItems(o.items||[]);
     document.getElementById('edit-modal').classList.add('open');
   }
-  function closeEditModal() { document.getElementById('edit-modal').classList.remove('open'); editIdx = -1; }
+  function closeEditModal() { document.getElementById('edit-modal').classList.remove('open'); editIdx=-1; }
   function saveEditModal() {
-    if (editIdx < 0) return;
-    var newOrderNum = document.getElementById('modal-ordernum').value.trim();
-    if (!newOrderNum) return;
-    orders[editIdx].orderNum = newOrderNum;
-    orders[editIdx].dueDate = document.getElementById('modal-duedate').value;
-    orders[editIdx].fittingDate = document.getElementById('modal-fittingdate').value;
-    orders[editIdx].remarks = document.getElementById('modal-remarks').value.trim();
-    orders[editIdx].items = getModalItems();
-    closeEditModal(); renderOrders(); 
-    syncToServer(orders[editIdx]);
+    if (editIdx<0) return;
+    var newNum=document.getElementById('modal-ordernum').value.trim(); if(!newNum) return;
+    orders[editIdx].orderNum=newNum;
+    orders[editIdx].dueDate=document.getElementById('modal-duedate').value;
+    orders[editIdx].fittingDate=document.getElementById('modal-fittingdate').value;
+    orders[editIdx].remarks=document.getElementById('modal-remarks').value.trim();
+    orders[editIdx].items=getModalItems();
+    closeEditModal(); renderOrders(); syncToServer(orders[editIdx]);
   }
   function renderModalItems(items) {
-    var grid = document.getElementById('modal-items-container');
-    var html = '<div style="display:flex;flex-direction:column;gap:10px">';
-    items.forEach(function(item, i) {
-      var hasLining = needsLining(item.product);
-      html += '<div style="background:var(--surface2);border:1.5px solid var(--border);border-radius:var(--radius-sm);padding:12px 14px">'
-        + '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">'
-        + '<select class="modal-input modal-item-product" data-idx="'+i+'" style="margin-bottom:0;flex:1;height:44px">';
-      PRODUCTS.forEach(function(p) { html += '<option value="'+esc(p)+'"'+(p===item.product?' selected':'')+'>'+esc(p)+'</option>'; });
-      html += '</select><div onclick="removeModalItem('+i+')" class="remove-item-btn" style="margin-left:10px;flex-shrink:0">✕</div></div>'
-        + '<div class="fabric-row"><label>Fabric</label><input type="text" class="modal-input modal-item-fabric" value="'+esc(item.fabric||'')+'" style="margin-bottom:0;height:44px"></div>'
-        + '<div class="fabric-row" style="margin-top:6px"><label>Lining</label><input type="text" class="modal-input modal-item-lining" placeholder="Lining No." value="'+esc(item.lining||'')+'" style="margin-bottom:0;height:44px"></div></div>';
+    var grid=document.getElementById('modal-items-container');
+    var html='<div style="display:flex;flex-direction:column;gap:10px">';
+    items.forEach(function(item,i) {
+      html+='<div style="background:var(--surface2);border:1.5px solid var(--border);border-radius:var(--radius-sm);padding:12px 14px">'
+        +'<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">'
+        +'<select class="modal-input modal-item-product" data-idx="'+i+'" style="margin-bottom:0;flex:1;height:44px">';
+      PRODUCTS.forEach(function(p){ html+='<option value="'+esc(p)+'"'+(p===item.product?' selected':'')+'>'+esc(p)+'</option>'; });
+      html+='</select><div onclick="removeModalItem('+i+')" class="remove-item-btn" style="margin-left:10px;flex-shrink:0">✕</div></div>'
+        +'<div class="fabric-row"><label>Fabric</label><input type="text" class="modal-input modal-item-fabric" value="'+esc(item.fabric||'')+'" style="margin-bottom:0;height:44px"></div>'
+        +'<div class="fabric-row" style="margin-top:6px"><label>Lining</label><input type="text" class="modal-input modal-item-lining" placeholder="Lining No." value="'+esc(item.lining||'')+'" style="margin-bottom:0;height:44px"></div></div>';
     });
-    html += '</div><button class="modal-btn" onclick="addModalItem()" style="margin-top:12px;width:100%;text-align:center">+ Add Product</button>';
-    grid.innerHTML = html;
+    html+='</div><button class="modal-btn" onclick="addModalItem()" style="margin-top:12px;width:100%;text-align:center">+ Add Product</button>';
+    grid.innerHTML=html;
   }
-  function addModalItem() { var items = getModalItems(); items.push({ product:'Jacket', fabric:'', lining:'', status:'', paid:false, invoice:false, stuck:false }); renderModalItems(items); }
-  function removeModalItem(idx) { var items = getModalItems(); items.splice(idx, 1); renderModalItems(items); }
+  function addModalItem() { var items=getModalItems(); items.push({product:'Jacket',fabric:'',lining:'',status:'',paid:false,invoice:false,stuck:false}); renderModalItems(items); }
+  function removeModalItem(idx) { var items=getModalItems(); items.splice(idx,1); renderModalItems(items); }
   function getModalItems() {
-    var c = document.getElementById('modal-items-container');
-    var p = c.querySelectorAll('.modal-item-product'); var f = c.querySelectorAll('.modal-item-fabric'); var l = c.querySelectorAll('.modal-item-lining');
-    var ex = editIdx >= 0 ? (orders[editIdx].items || []) : []; var items = [];
-    for (var i=0; i<p.length; i++) items.push({ product:p[i].value, fabric:f[i]?f[i].value.trim():'', lining:l[i]?l[i].value.trim():'', status:(ex[i]||{}).status||'', paid:(ex[i]||{}).paid||false, invoice:(ex[i]||{}).invoice||false, stuck:(ex[i]||{}).stuck||false });
+    var c=document.getElementById('modal-items-container');
+    var p=c.querySelectorAll('.modal-item-product'),f=c.querySelectorAll('.modal-item-fabric'),l=c.querySelectorAll('.modal-item-lining');
+    var ex=editIdx>=0?(orders[editIdx].items||[]):[], items=[];
+    for(var i=0;i<p.length;i++) items.push({product:p[i].value,fabric:f[i]?f[i].value.trim():'',lining:l[i]?l[i].value.trim():'',status:(ex[i]||{}).status||'',paid:(ex[i]||{}).paid||false,invoice:(ex[i]||{}).invoice||false,stuck:(ex[i]||{}).stuck||false});
     return items;
   }
 
-  // ==========================================
-  // RENDER & FILTER UI LOGIC
-  // ==========================================
-  function statusClass(s) { var map = { 'Batam':'on-batam','Delta':'on-delta','Fabric Ordered':'on-fabricordered','In-store':'on-instore','Take Home':'on-takehome','Bin':'on-bin' }; return map[s] || ''; }
-  function formatDisplayDate(iso) { var p=iso.split('-'); var m=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']; return parseInt(p[2],10)+' '+m[parseInt(p[1],10)-1]+' '+p[0]; }
-  function isDueSoon(iso) { if(!iso)return false; var d=new Date(iso); var n=new Date(); n.setHours(0,0,0,0); var diff=(d-n)/86400000; return diff>=0&&diff<=3; }
-  function showToast(msg) { var t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show'); setTimeout(function(){ t.classList.remove('show'); }, 2600); }
+  // ── RENDER HELPERS ──
+  function statusClass(s) { var m={'Batam':'on-batam','Delta':'on-delta','Fabric Ordered':'on-fabricordered','In-store':'on-instore','Take Home':'on-takehome','Bin':'on-bin'}; return m[s]||''; }
+  function showToast(msg) { var t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show'); setTimeout(function(){ t.classList.remove('show'); },2600); }
   function esc(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 
-  var expandedOrders = {};
-
   function fittedDotsHtml(oi) {
-    var fitted = orders[oi].fitted || 0; var fittedDates = orders[oi].fittedDates || {};
-    var colors = ['red','amber','green']; var labels = ['Baste Fitting','Fitting','Final / Take Home'];
-    var html = '<div style="display:flex;gap:8px;align-items:flex-start">';
-    for (var k = 0; k < 3; k++) {
-      var level = k + 1; var isLit = k < fitted; var isNext = level === fitted + 1;
-      var dateStr = fittedDates[level] ? formatDisplayDate(fittedDates[level]) : '';
-      var clickAttr = isLit ? 'onclick="event.stopPropagation();editTlDate('+oi+','+level+')"' : (isNext ? 'onclick="event.stopPropagation();toggleOrderFitted('+oi+')"' : '');
-      html += '<div style="display:flex;flex-direction:column;align-items:center;gap:3px;cursor:'+(isLit||isNext?'pointer':'default')+'" '+clickAttr+'>';
-      html += '<div class="fitted-dot '+(isLit?colors[k]:'off')+'"></div>';
-      html += dateStr ? '<span style="font-size:9px;color:var(--text-muted);white-space:nowrap;max-width:52px;text-align:center">'+esc(dateStr)+'</span>' : '<span style="font-size:9px;color:transparent">·</span>';
-      if(isLit) html += '<button class="tl-delete-btn" onclick="event.stopPropagation();deleteTlDot('+oi+','+level+')">✕</button>';
-      html += '</div>';
+    var fitted=orders[oi].fitted||0, fittedDates=orders[oi].fittedDates||{};
+    var colors=['red','amber','green'], labels=['Baste Fitting','Fitting','Final / Take Home'];
+    var html='<div style="display:flex;gap:8px;align-items:flex-start">';
+    for (var k=0;k<3;k++) {
+      var level=k+1, isLit=k<fitted, isNext=level===fitted+1;
+      var dateStr=fittedDates[level]?formatDisplayDate(fittedDates[level]):'';
+      var click=isLit?'onclick="event.stopPropagation();editTlDate('+oi+','+level+')"':(isNext?'onclick="event.stopPropagation();toggleOrderFitted('+oi+')"':'');
+      html+='<div style="display:flex;flex-direction:column;align-items:center;gap:3px;cursor:'+(isLit||isNext?'pointer':'default')+'" '+click+'>'
+        +'<div class="fitted-dot '+(isLit?colors[k]:'off')+'"></div>'
+        +(dateStr?'<span style="font-size:9px;color:var(--text-muted);white-space:nowrap;max-width:52px;text-align:center">'+esc(dateStr)+'</span>':'<span style="font-size:9px;color:transparent">·</span>')
+        +(isLit?'<button class="tl-delete-btn" onclick="event.stopPropagation();deleteTlDot('+oi+','+level+')">✕</button>':'')
+        +'</div>';
     }
-    return html + '</div>';
+    return html+'</div>';
   }
 
+  // ── RENDER ORDERS ──
   function renderOrders() {
-    var el = document.getElementById('orders-content'); var searchEl = document.getElementById('order-search'); var searchTerm = searchEl ? searchEl.value.trim().toLowerCase() : '';
-    
-    // Show/hide search clear button
-    document.getElementById('search-clear').style.display = searchTerm ? 'block' : 'none';
-    
-    var hasProductFilter = Object.keys(activeProductFilters).some(function(k) { return activeProductFilters[k]; });
-    
-    var filtered = orders.map(function(o,i){return {order:o, origIdx:i};}).filter(function(e){
-      var o = e.order; var items = o.items || [];
-      
-      // Check product filter
-      if(hasProductFilter) {
-        var hasMatchingProduct = items.some(function(it) {
-          return activeProductFilters[it.product];
-        });
-        if(!hasMatchingProduct) return false;
-      }
-      
-      // Check status/stuck/unpaid filters
-      if(activeStatusFilter && !items.some(function(it){return it.status===activeStatusFilter;})) return false;
-      if(activeStuckFilter && !items.some(function(it){return it.stuck;})) return false;
-      if(activeUnpaidFilter && !items.some(function(it){return !it.paid;})) return false;
-      
-      // Check search - ONLY if there's a search term
+    var el=document.getElementById('orders-content');
+    var searchEl=document.getElementById('order-search');
+    var searchTerm=searchEl?searchEl.value.trim().toLowerCase():'';
+    var clearBtn=document.getElementById('search-clear'); if(clearBtn) clearBtn.style.display=searchTerm?'block':'none';
+    var hasPF=Object.keys(activeProductFilters).some(function(k){ return activeProductFilters[k]; });
+
+    var filtered=orders.map(function(o,i){ return {order:o,origIdx:i}; }).filter(function(e){
+      var o=e.order, items=o.items||[];
+      if(hasPF && !items.some(function(it){ return activeProductFilters[it.product]; })) return false;
+      if(activeStatusFilter && !items.some(function(it){ return it.status===activeStatusFilter; })) return false;
+      if(activeStuckFilter  && !items.some(function(it){ return it.stuck; })) return false;
+      if(activeUnpaidFilter && !items.some(function(it){ return !it.paid; })) return false;
       if(searchTerm) {
-        // Search by order number (force string comparison)
-        if(String(o.orderNum||'').toLowerCase().indexOf(searchTerm) !== -1) return true;
-        // Search by remarks
-        if((o.remarks||'').toLowerCase().indexOf(searchTerm) !== -1) return true;
-        // Search by fabric or lining
-        if(items.some(function(it){ return (it.fabric||'').toLowerCase().indexOf(searchTerm) !== -1 || (it.lining||'').toLowerCase().indexOf(searchTerm) !== -1; })) return true;
-        // NO MATCH found for search term
+        if(String(o.orderNum||'').toLowerCase().indexOf(searchTerm)!==-1) return true;
+        if((o.remarks||'').toLowerCase().indexOf(searchTerm)!==-1) return true;
+        if(items.some(function(it){ return (it.fabric||'').toLowerCase().indexOf(searchTerm)!==-1||(it.lining||'').toLowerCase().indexOf(searchTerm)!==-1; })) return true;
         return false;
       }
-      
-      // No search term, so return true if pass filter checks above
       return true;
     });
 
-    if(currentSort==='default') filtered.sort(function(a,b){return new Date(b.order.date||0) - new Date(a.order.date||0);});
-    else if(currentSort==='newest') filtered.sort(function(a,b){return new Date(a.order.date||0) - new Date(b.order.date||0);});
-    else if(currentSort==='due-asc') filtered.sort(function(a,b){return (a.order.dueDate||'9999').localeCompare(b.order.dueDate||'9999');});
-    else if(currentSort==='due-desc') filtered.sort(function(a,b){return (b.order.dueDate||'9999').localeCompare(a.order.dueDate||'9999');});
-    else if(currentSort==='fit-asc') filtered.sort(function(a,b){return (a.order.fittingDate||'9999').localeCompare(b.order.fittingDate||'9999');});
-    else if(currentSort==='fit-desc') filtered.sort(function(a,b){return (b.order.fittingDate||'9999').localeCompare(a.order.fittingDate||'9999');});
+    if(currentSort==='default')   filtered.sort(function(a,b){ return (b.order.date||'').localeCompare(a.order.date||''); });
+    else if(currentSort==='newest')   filtered.sort(function(a,b){ return (a.order.date||'').localeCompare(b.order.date||''); });
+    else if(currentSort==='due-asc')  filtered.sort(function(a,b){ return (a.order.dueDate||'9999').localeCompare(b.order.dueDate||'9999'); });
+    else if(currentSort==='due-desc') filtered.sort(function(a,b){ return (b.order.dueDate||'9999').localeCompare(a.order.dueDate||'9999'); });
+    else if(currentSort==='fit-asc')  filtered.sort(function(a,b){ return (a.order.fittingDate||'9999').localeCompare(b.order.fittingDate||'9999'); });
+    else if(currentSort==='fit-desc') filtered.sort(function(a,b){ return (b.order.fittingDate||'9999').localeCompare(a.order.fittingDate||'9999'); });
 
-    if (filtered.length === 0) { el.innerHTML = '<div class="right-empty">No orders found.</div>'; return; }
+    if(filtered.length===0){ el.innerHTML='<div class="right-empty"><span class="right-empty-icon">🔍</span>'+(searchTerm?'No orders match "'+esc(searchTerm)+'"':'No orders found.')+'</div>'; updateBadges(); return; }
 
-    var html = '<div class="orders-panel-label">Submitted Orders</div>';
-    filtered.forEach(function(e) {
-      var o = e.order; var oi = e.origIdx; var items = o.items || [];
-      var dueSoon = isDueSoon(o.dueDate) && items.some(function(it){ return it.status!=='Take Home'; });
-      var dDue = o.dueDate ? formatDisplayDate(o.dueDate) : '—'; var dFit = o.fittingDate ? formatDisplayDate(o.fittingDate) : '—';
-      var tom = (function(){var t=new Date(); t.setDate(t.getDate()+1); return t.getFullYear()+'-'+String(t.getMonth()+1).padStart(2,'0')+'-'+String(t.getDate()).padStart(2,'0');})();
-
-      var dOrdered = o.date ? formatDisplayDate(o.date.split('T')[0]) : '—';
-      html += '<div class="order-card" id="order-card-'+oi+'"><div class="order-summary"><span class="order-summary-num">'+esc(o.orderNum)+'</span><div class="order-summary-dates">'
-        + '<div class="hdr-date-group"><span class="hdr-date-label">Ordered</span><span class="hdr-date-val">'+esc(dOrdered)+'</span></div>'
-        + '<div class="hdr-date-group due-date-cell" onclick="openInlineDatePicker('+oi+',this)"><span class="hdr-date-label">Due Date</span><span class="due-date-display hdr-date-val'+(dueSoon?' due-soon':'')+'">'+esc(dDue)+'</span><input type="date" class="due-date-picker" value="'+(o.dueDate||'')+'" min="'+tom+'" onchange="saveInlineDate('+oi+',\'due\',this)" onblur="cancelInlineDate()" onclick="event.stopPropagation()"></div>'
-        + '<div class="hdr-date-group fitting-date-cell" onclick="openFittingDatePicker('+oi+',this)"><span class="hdr-date-label">Fitting Date</span><span class="fitting-date-display hdr-date-val">'+esc(dFit)+'</span><input type="date" class="fitting-date-picker" value="'+(o.fittingDate||'')+'" min="'+tom+'" onchange="saveInlineDate('+oi+',\'fitting\',this)" onblur="cancelFittingDate()" onclick="event.stopPropagation()"></div>'
-        + '</div><div class="order-summary-right" onclick="event.stopPropagation()">' + fittedDotsHtml(oi)
-        + '<button class="archive-btn" onclick="archiveOrder('+oi+')">📦 Archive</button>'
-        + '<div class="edit-btn" onclick="openEditModal('+oi+')">✎</div><div class="delete-btn" onclick="deleteOrder('+oi+')">✕</div></div></div>'
-        + '<div class="order-detail">';
-
-      items.forEach(function(it, ii) {
-        html += '<div class="detail-item"><div class="detail-product-name">'+esc(it.product)+'</div>'
-          + '<div class="detail-fabric-meta">Fabric: '+esc(it.fabric)+(it.lining?' · Lining: '+esc(it.lining):'')+'</div>'
-          + '<div class="detail-item-actions">'
-          + '<span class="status-btn '+statusClass(it.status)+'" onclick="toggleItemStatus('+oi+','+ii+',\'status\')">'+esc(it.status||'—')+'</span>'
-          + '<span class="status-btn'+(it.stuck?' on-stuck':'')+'" onclick="toggleItemStatus('+oi+','+ii+',\'stuck\')">'+(it.stuck?'🔴 Stuck':'Stuck')+'</span>'
-          + '<span class="status-btn'+(it.paid?' on-paid':'')+'" onclick="toggleItemStatus('+oi+','+ii+',\'paid\')">'+(it.paid?'✓ Paid':'Unpaid')+'</span>'
-          + '<div class="delete-btn" onclick="deleteItem('+oi+','+ii+')">✕</div></div></div>';
+    var tom=(function(){ var t=new Date(); t.setDate(t.getDate()+1); return t.getFullYear()+'-'+String(t.getMonth()+1).padStart(2,'0')+'-'+String(t.getDate()).padStart(2,'0'); })();
+    var html='<div class="orders-panel-label">Submitted Orders</div>';
+    filtered.forEach(function(e){
+      var o=e.order, oi=e.origIdx, items=o.items||[];
+      var dueSoon=isDueSoon(o.dueDate)&&items.some(function(it){ return it.status!=='Take Home'; });
+      var dDue=formatDisplayDate(o.dueDate), dFit=formatDisplayDate(o.fittingDate), dOrd=formatDisplayDate(o.date);
+      html+='<div class="order-card" id="order-card-'+oi+'"><div class="order-summary"><span class="order-summary-num">'+esc(o.orderNum)+'</span>'
+        +'<div class="order-summary-dates">'
+        +'<div class="hdr-date-group"><span class="hdr-date-label">Ordered</span><span class="hdr-date-val">'+esc(dOrd)+'</span></div>'
+        +'<div class="hdr-date-group due-date-cell" onclick="openInlineDatePicker('+oi+',this)"><span class="hdr-date-label">Due Date</span><span class="due-date-display hdr-date-val'+(dueSoon?' due-soon':'')+'">'+esc(dDue)+'</span><input type="date" class="due-date-picker" value="'+(o.dueDate||'')+'" min="'+tom+'" onchange="saveInlineDate('+oi+',\'due\',this)" onblur="cancelInlineDate()" onclick="event.stopPropagation()"></div>'
+        +'<div class="hdr-date-group fitting-date-cell" onclick="openFittingDatePicker('+oi+',this)"><span class="hdr-date-label">Fitting Date</span><span class="fitting-date-display hdr-date-val">'+esc(dFit)+'</span><input type="date" class="fitting-date-picker" value="'+(o.fittingDate||'')+'" min="'+tom+'" onchange="saveInlineDate('+oi+',\'fitting\',this)" onblur="cancelFittingDate()" onclick="event.stopPropagation()"></div>'
+        +'</div><div class="order-summary-right" onclick="event.stopPropagation()">'+fittedDotsHtml(oi)
+        +'<button class="archive-btn" onclick="archiveOrder('+oi+')">📦 Archive</button>'
+        +'<div class="edit-btn" onclick="openEditModal('+oi+')">✎</div><div class="delete-btn" onclick="deleteOrder('+oi+')">✕</div>'
+        +'</div></div><div class="order-detail">';
+      items.forEach(function(it,ii){
+        html+='<div class="detail-item"><div class="detail-product-name">'+esc(it.product)+'</div>'
+          +'<div class="detail-fabric-meta">Fabric: '+esc(it.fabric)+(it.lining?' · Lining: '+esc(it.lining):'')+'</div>'
+          +'<div class="detail-item-actions">'
+          +'<span class="status-btn '+statusClass(it.status)+'" onclick="toggleItemStatus('+oi+','+ii+',\'status\')">'+esc(it.status||'—')+'</span>'
+          +'<span class="status-btn'+(it.stuck?' on-stuck':'')+'" onclick="toggleItemStatus('+oi+','+ii+',\'stuck\')">'+(it.stuck?'🔴 Stuck':'Stuck')+'</span>'
+          +'<span class="status-btn'+(it.paid?' on-paid':'')+'" onclick="toggleItemStatus('+oi+','+ii+',\'paid\')">'+(it.paid?'✓ Paid':'Unpaid')+'</span>'
+          +'<div class="delete-btn" onclick="deleteItem('+oi+','+ii+')">✕</div></div></div>';
       });
-      if(o.remarks) html += '<div style="padding:6px 16px 8px;font-size:11px;color:var(--text-faint);background:var(--surface2);border-top:1px solid var(--border)">📝 '+esc(o.remarks)+'</div>';
-      html += '</div></div>';
+      if(o.remarks) html+='<div style="padding:6px 16px 8px;font-size:11px;color:var(--text-faint);background:var(--surface2);border-top:1px solid var(--border)">📝 '+esc(o.remarks)+'</div>';
+      html+='</div></div>';
     });
-    el.innerHTML = html; updateBadges();
+    el.innerHTML=html; updateBadges();
   }
 
+  // ── RENDER ARCHIVE ──
   function renderArchive() {
-    var el = document.getElementById('archive-content');
-    var searchEl = document.getElementById('archive-search');
-    var searchTerm = searchEl ? searchEl.value.trim().toLowerCase() : '';
+    var el=document.getElementById('archive-content');
+    var searchEl=document.getElementById('archive-search');
+    var searchTerm=searchEl?searchEl.value.trim().toLowerCase():'';
+    var clearBtn=document.getElementById('archive-search-clear'); if(clearBtn) clearBtn.style.display=searchTerm?'block':'none';
 
-    // Update clear button visibility
-    var clearBtn = document.getElementById('archive-search-clear');
-    if (clearBtn) clearBtn.style.display = searchTerm ? 'block' : 'none';
-
-    var filtered = archivedOrders.map(function(o,i){return {order:o, origIdx:i};}).filter(function(e){
-      var o = e.order; if(!searchTerm) return true;
-      if(String(o.orderNum||'').toLowerCase().indexOf(searchTerm)!==-1 || (o.remarks||'').toLowerCase().indexOf(searchTerm)!==-1) return true;
-      return (o.items||[]).some(function(it){ return (it.fabric||'').toLowerCase().indexOf(searchTerm)!==-1 || (it.lining||'').toLowerCase().indexOf(searchTerm)!==-1; });
+    var filtered=archivedOrders.map(function(o,i){ return {order:o,origIdx:i}; }).filter(function(e){
+      var o=e.order; if(!searchTerm) return true;
+      if(String(o.orderNum||'').toLowerCase().indexOf(searchTerm)!==-1) return true;
+      if((o.remarks||'').toLowerCase().indexOf(searchTerm)!==-1) return true;
+      return (o.items||[]).some(function(it){ return (it.fabric||'').toLowerCase().indexOf(searchTerm)!==-1||(it.lining||'').toLowerCase().indexOf(searchTerm)!==-1; });
     });
 
-    if(currentArchiveSort==='default') filtered.sort(function(a,b){return new Date(b.order.date||0) - new Date(a.order.date||0);});
-    else if(currentArchiveSort==='newest') filtered.sort(function(a,b){return new Date(a.order.date||0) - new Date(b.order.date||0);});
-    else if(currentArchiveSort==='due-asc') filtered.sort(function(a,b){return (a.order.dueDate||'9999').localeCompare(b.order.dueDate||'9999');});
-    else if(currentArchiveSort==='due-desc') filtered.sort(function(a,b){return (b.order.dueDate||'9999').localeCompare(a.order.dueDate||'9999');});
-    else if(currentArchiveSort==='fit-asc') filtered.sort(function(a,b){return (a.order.fittingDate||'9999').localeCompare(b.order.fittingDate||'9999');});
-    else if(currentArchiveSort==='fit-desc') filtered.sort(function(a,b){return (b.order.fittingDate||'9999').localeCompare(a.order.fittingDate||'9999');});
+    if(currentArchiveSort==='default')   filtered.sort(function(a,b){ return (b.order.date||'').localeCompare(a.order.date||''); });
+    else if(currentArchiveSort==='newest')   filtered.sort(function(a,b){ return (a.order.date||'').localeCompare(b.order.date||''); });
+    else if(currentArchiveSort==='due-asc')  filtered.sort(function(a,b){ return (a.order.dueDate||'9999').localeCompare(b.order.dueDate||'9999'); });
+    else if(currentArchiveSort==='due-desc') filtered.sort(function(a,b){ return (b.order.dueDate||'9999').localeCompare(a.order.dueDate||'9999'); });
+    else if(currentArchiveSort==='fit-asc')  filtered.sort(function(a,b){ return (a.order.fittingDate||'9999').localeCompare(b.order.fittingDate||'9999'); });
+    else if(currentArchiveSort==='fit-desc') filtered.sort(function(a,b){ return (b.order.fittingDate||'9999').localeCompare(a.order.fittingDate||'9999'); });
 
-    if (filtered.length === 0) { el.innerHTML = '<div class="right-empty">No archived orders found.</div>'; return; }
+    if(filtered.length===0){ el.innerHTML='<div class="right-empty"><span class="right-empty-icon">🔍</span>'+(searchTerm?'No archived orders match "'+esc(searchTerm)+'"':'No archived orders.')+'</div>'; updateBadges(); return; }
 
-    var html = '<div class="orders-panel-label">Archived Orders</div>';
-    filtered.forEach(function(e) {
-      var o = e.order; var ai = e.origIdx; var items = o.items || [];
-      var dDue = o.dueDate ? formatDisplayDate(o.dueDate) : '—'; var dFit = o.fittingDate ? formatDisplayDate(o.fittingDate) : '—'; var dOrdered = o.date ? formatDisplayDate(o.date.split('T')[0]) : '—';
-
-      html += '<div class="order-card" id="arc-card-'+ai+'"><div class="order-summary"><span class="order-summary-num">'+esc(o.orderNum)+'</span><div class="order-summary-dates">'
-        + '<div class="hdr-date-group"><span class="hdr-date-label">Ordered</span><span class="hdr-date-val">'+esc(dOrdered)+'</span></div>'
-        + '<div class="hdr-date-group"><span class="hdr-date-label">Due Date</span><span class="hdr-date-val">'+esc(dDue)+'</span></div>'
-        + '<div class="hdr-date-group"><span class="hdr-date-label">Fitting Date</span><span class="hdr-date-val">'+esc(dFit)+'</span></div>'
-        + '</div><div class="order-summary-right">'
-        + '<button class="restore-btn" onclick="restoreOrder('+ai+')">↩ Restore</button><div class="delete-btn" onclick="deleteArchiveOrder('+ai+')">✕</div></div></div>'
-        + '<div class="order-detail">';
-
-      items.forEach(function(it, ii) {
-        html += '<div class="detail-item"><div class="detail-product-name">'+esc(it.product)+'</div>'
-          + '<div class="detail-fabric-meta">Fabric: '+esc(it.fabric)+(it.lining?' · Lining: '+esc(it.lining):'')+'</div>'
-          + '<div class="detail-item-actions">'
-          + '<span class="status-btn '+statusClass(it.status||'Take Home')+'">'+esc(it.status||'Take Home')+'</span>'
-          + '<span class="status-btn'+(it.paid?' on-paid':'')+'" onclick="toggleArchiveItemPaid('+ai+','+ii+')">'+(it.paid?'✓ Paid':'Unpaid')+'</span>'
-          + '</div></div>';
+    var html='<div class="orders-panel-label">Archived Orders</div>';
+    filtered.forEach(function(e){
+      var o=e.order, ai=e.origIdx, items=o.items||[];
+      var dDue=formatDisplayDate(o.dueDate), dFit=formatDisplayDate(o.fittingDate), dOrd=formatDisplayDate(o.date);
+      html+='<div class="order-card" id="arc-card-'+ai+'"><div class="order-summary"><span class="order-summary-num">'+esc(o.orderNum)+'</span>'
+        +'<div class="order-summary-dates">'
+        +'<div class="hdr-date-group"><span class="hdr-date-label">Ordered</span><span class="hdr-date-val">'+esc(dOrd)+'</span></div>'
+        +'<div class="hdr-date-group"><span class="hdr-date-label">Due Date</span><span class="hdr-date-val">'+esc(dDue)+'</span></div>'
+        +'<div class="hdr-date-group"><span class="hdr-date-label">Fitting Date</span><span class="hdr-date-val">'+esc(dFit)+'</span></div>'
+        +'</div><div class="order-summary-right">'
+        +'<button class="restore-btn" onclick="restoreOrder('+ai+')">↩ Restore</button>'
+        +'<div class="delete-btn" onclick="deleteArchiveOrder('+ai+')">✕</div>'
+        +'</div></div><div class="order-detail">';
+      items.forEach(function(it,ii){
+        html+='<div class="detail-item"><div class="detail-product-name">'+esc(it.product)+'</div>'
+          +'<div class="detail-fabric-meta">Fabric: '+esc(it.fabric)+(it.lining?' · Lining: '+esc(it.lining):'')+'</div>'
+          +'<div class="detail-item-actions">'
+          +'<span class="status-btn '+statusClass(it.status||'Take Home')+'">'+esc(it.status||'Take Home')+'</span>'
+          +'<span class="status-btn'+(it.paid?' on-paid':'')+'" onclick="toggleArchiveItemPaid('+ai+','+ii+')">'+(it.paid?'✓ Paid':'Unpaid')+'</span>'
+          +'</div></div>';
       });
-      if(o.remarks) html += '<div style="padding:6px 16px 8px;font-size:11px;color:var(--text-faint);background:var(--surface2);border-top:1px solid var(--border)">📝 '+esc(o.remarks)+'</div>';
-      html += '</div></div>';
+      if(o.remarks) html+='<div style="padding:6px 16px 8px;font-size:11px;color:var(--text-faint);background:var(--surface2);border-top:1px solid var(--border)">📝 '+esc(o.remarks)+'</div>';
+      html+='</div></div>';
     });
-    el.innerHTML = html; updateBadges();
+    el.innerHTML=html; updateBadges();
   }
 
-  // UI Setup & Sorting Toggles
-  function setSort(mode) { currentSort = mode; updateSortButtons(); renderOrders(); }
-  function setArchiveSort(mode) { currentArchiveSort = mode; updateArchiveSortButtons(); renderArchive(); }
-  function toggleSort() { setSort(currentSort==='newest'?'default':'newest'); }
-  function toggleDueSort() { setSort(currentSort==='due-asc'?'due-desc':'due-asc'); }
-  function toggleFitSort() { setSort(currentSort==='fit-asc'?'fit-desc':'fit-asc'); }
-  function toggleArchiveSort() { setArchiveSort(currentArchiveSort==='newest'?'default':'newest'); }
+  // ── SORT & FILTER ──
+  function setSort(mode)        { currentSort=mode; updateSortButtons(); renderOrders(); }
+  function setArchiveSort(mode) { currentArchiveSort=mode; updateArchiveSortButtons(); renderArchive(); }
+  function toggleSort()           { setSort(currentSort==='newest'?'default':'newest'); }
+  function toggleDueSort()        { setSort(currentSort==='due-asc'?'due-desc':'due-asc'); }
+  function toggleFitSort()        { setSort(currentSort==='fit-asc'?'fit-desc':'fit-asc'); }
+  function toggleArchiveSort()    { setArchiveSort(currentArchiveSort==='newest'?'default':'newest'); }
   function toggleArchiveDueSort() { setArchiveSort(currentArchiveSort==='due-asc'?'due-desc':'due-asc'); }
   function toggleArchiveFitSort() { setArchiveSort(currentArchiveSort==='fit-asc'?'fit-desc':'fit-asc'); }
-  
-  // Update visual highlighting for sort buttons
-  function updateSortButtons() {
-    document.querySelectorAll('[data-sort]').forEach(function(btn) {
-      btn.classList.remove('active');
-    });
-    var activeBtn = document.querySelector('[data-sort="'+currentSort+'"]');
-    if(activeBtn) activeBtn.classList.add('active');
+  function updateSortButtons() { document.querySelectorAll('[data-sort]').forEach(function(b){ b.classList.remove('active'); }); var a=document.querySelector('[data-sort="'+currentSort+'"]'); if(a) a.classList.add('active'); }
+  function updateArchiveSortButtons() { document.querySelectorAll('[data-archive-sort]').forEach(function(b){ b.classList.remove('active'); }); var a=document.querySelector('[data-archive-sort="'+currentArchiveSort+'"]'); if(a) a.classList.add('active'); }
+  function toggleProductFilter(p) { activeProductFilters[p]=!activeProductFilters[p]; updateProductFilterButtons(); renderOrders(); }
+  function updateProductFilterButtons() { document.querySelectorAll('.product-filter-btn').forEach(function(btn){ btn.classList.toggle('active',!!activeProductFilters[btn.getAttribute('data-product')]); }); }
+  function toggleStatusFilter(status) {
+    if(activeStatusFilter===status){ clearStatusFilter(); return; }
+    activeStatusFilter=status; activeStuckFilter=false; activeUnpaidFilter=false;
+    document.getElementById('filter-clear').style.display=''; updateStatusFilterButtons(); renderOrders();
   }
-  
-  function updateArchiveSortButtons() {
-    document.querySelectorAll('[data-archive-sort]').forEach(function(btn) {
-      btn.classList.remove('active');
-    });
-    var activeBtn = document.querySelector('[data-archive-sort="'+currentArchiveSort+'"]');
-    if(activeBtn) activeBtn.classList.add('active');
-  }
-  
-  // Filter by product
-  function toggleProductFilter(product) {
-    activeProductFilters[product] = !activeProductFilters[product];
-    updateProductFilterButtons();
-    renderOrders();
-  }
-  
-  function updateProductFilterButtons() {
-    document.querySelectorAll('.product-filter-btn').forEach(function(btn) {
-      var prod = btn.getAttribute('data-product');
-      if(activeProductFilters[prod]) {
-        btn.classList.add('active');
-      } else {
-        btn.classList.remove('active');
-      }
-    });
-  }
-  
-  function clearProductFilters() {
-    activeProductFilters = {};
-    updateProductFilterButtons();
-    renderOrders();
-  }
+  function toggleStuckFilter() { activeStuckFilter=!activeStuckFilter; activeStatusFilter=null; activeUnpaidFilter=false; document.getElementById('filter-clear').style.display=activeStuckFilter?'':'none'; updateStuckFilterButton(); renderOrders(); }
+  function toggleUnpaidFilter() { activeUnpaidFilter=!activeUnpaidFilter; activeStatusFilter=null; activeStuckFilter=false; document.getElementById('filter-clear').style.display=activeUnpaidFilter?'':'none'; updateUnpaidFilterButton(); renderOrders(); }
+  function clearStatusFilter() { activeStatusFilter=null; activeStuckFilter=false; activeUnpaidFilter=false; document.getElementById('filter-clear').style.display='none'; updateStatusFilterButtons(); updateStuckFilterButton(); updateUnpaidFilterButton(); renderOrders(); }
+  function updateStatusFilterButtons() { document.querySelectorAll('.status-filter-btn').forEach(function(b){ b.classList.remove('active'); }); if(activeStatusFilter){ var a=document.querySelector('[data-status="'+activeStatusFilter+'"]'); if(a) a.classList.add('active'); } }
+  function updateStuckFilterButton()  { document.getElementById('filter-stuck').classList.toggle('active', activeStuckFilter); }
+  function updateUnpaidFilterButton() { document.getElementById('filter-unpaid').classList.toggle('active', activeUnpaidFilter); }
+  function clearSearch() { document.getElementById('order-search').value=''; document.getElementById('search-clear').style.display='none'; renderOrders(); }
+  function clearArchiveSearch() { document.getElementById('archive-search').value=''; document.getElementById('archive-search-clear').style.display='none'; renderArchive(); }
 
-  function toggleNoneDate(f) { var i=document.getElementById(f+'-input'), b=document.getElementById(f+'-none-btn'); if(i.value){i.value='';b.classList.add('none-btn-active');}else{b.classList.toggle('none-btn-active');} }
-  document.getElementById('duedate-input').addEventListener('change', function(){if(this.value)document.getElementById('duedate-none-btn').classList.remove('none-btn-active');});
-  document.getElementById('fittingdate-input').addEventListener('change', function(){if(this.value)document.getElementById('fittingdate-none-btn').classList.remove('none-btn-active');});
-
-  function toggleStatusFilter(status) { 
-    if(activeStatusFilter===status){clearStatusFilter();return;} 
-    activeStatusFilter=status; activeStuckFilter=false; activeUnpaidFilter=false; 
-    document.getElementById('filter-clear').style.display='';
-    updateStatusFilterButtons();
-    renderOrders(); 
+  // ── MISC ──
+  function toggleNoneDate(f) {
+    var i=document.getElementById(f+'-input'), b=document.getElementById(f+'-none-btn');
+    if(i.value){ i.value=''; b.classList.add('none-btn-active'); } else { b.classList.toggle('none-btn-active'); }
   }
-  
-  function toggleStuckFilter() { 
-    activeStuckFilter=!activeStuckFilter; activeStatusFilter=null; activeUnpaidFilter=false; 
-    document.getElementById('filter-clear').style.display=activeStuckFilter?'':'none';
-    updateStuckFilterButton();
-    renderOrders(); 
-  }
-  
-  function toggleUnpaidFilter() { 
-    activeUnpaidFilter=!activeUnpaidFilter; activeStatusFilter=null; activeStuckFilter=false; 
-    document.getElementById('filter-clear').style.display=activeUnpaidFilter?'':'none';
-    updateUnpaidFilterButton();
-    renderOrders(); 
-  }
-  
-  function clearStatusFilter() { 
-    activeStatusFilter=null; activeStuckFilter=false; activeUnpaidFilter=false; 
-    document.getElementById('filter-clear').style.display='none';
-    updateStatusFilterButtons();
-    updateStuckFilterButton();
-    updateUnpaidFilterButton();
-    renderOrders(); 
-  }
-  
-  function clearSearch() {
-    document.getElementById('order-search').value = '';
-    document.getElementById('search-clear').style.display = 'none';
-    renderOrders();
-  }
-
-  function clearArchiveSearch() {
-    document.getElementById('archive-search').value = '';
-    document.getElementById('archive-search-clear').style.display = 'none';
-    renderArchive();
-  }
-  
-  function updateStatusFilterButtons() {
-    document.querySelectorAll('.status-filter-btn').forEach(function(btn) {
-      btn.classList.remove('active');
-    });
-    if(activeStatusFilter) {
-      var activeBtn = document.querySelector('[data-status="'+activeStatusFilter+'"]');
-      if(activeBtn) activeBtn.classList.add('active');
-    }
-  }
-  
-  function updateStuckFilterButton() {
-    var btn = document.getElementById('filter-stuck');
-    if(activeStuckFilter) {
-      btn.classList.add('active');
-    } else {
-      btn.classList.remove('active');
-    }
-  }
-  
-  function updateUnpaidFilterButton() {
-    var btn = document.getElementById('filter-unpaid');
-    if(activeUnpaidFilter) {
-      btn.classList.add('active');
-    } else {
-      btn.classList.remove('active');
-    }
-  }
-
-  // Set minimum dates on load
-  (function(){ var t=new Date(); t.setDate(t.getDate()+1); var m = t.getFullYear()+'-'+String(t.getMonth()+1).padStart(2,'0')+'-'+String(t.getDate()).padStart(2,'0'); document.getElementById('duedate-input').min=m; document.getElementById('fittingdate-input').min=m; document.getElementById('modal-duedate').min=m; document.getElementById('modal-fittingdate').min=m; })();
-  
-  // Close Modals on click outside
-  document.getElementById('del-modal').addEventListener('click', function(e){if(e.target===this)closeDelModal();});
-  document.getElementById('edit-modal').addEventListener('click', function(e){if(e.target===this)closeEditModal();});
+  document.getElementById('duedate-input').addEventListener('change',    function(){ if(this.value) document.getElementById('duedate-none-btn').classList.remove('none-btn-active'); });
+  document.getElementById('fittingdate-input').addEventListener('change', function(){ if(this.value) document.getElementById('fittingdate-none-btn').classList.remove('none-btn-active'); });
+  (function(){
+    var t=new Date(); t.setDate(t.getDate()+1);
+    var m=t.getFullYear()+'-'+String(t.getMonth()+1).padStart(2,'0')+'-'+String(t.getDate()).padStart(2,'0');
+    ['duedate-input','fittingdate-input','modal-duedate','modal-fittingdate'].forEach(function(id){ document.getElementById(id).min=m; });
+  })();
+  document.getElementById('del-modal').addEventListener('click',  function(e){ if(e.target===this) closeDelModal(); });
+  document.getElementById('edit-modal').addEventListener('click', function(e){ if(e.target===this) closeEditModal(); });
 </script>
-
 </body></html>

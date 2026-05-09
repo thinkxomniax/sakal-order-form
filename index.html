@@ -319,7 +319,8 @@
     <!-- Archive tab content -->
     <div id="pane-archive" style="display: none;">
       <div class="search-wrap">
-        <input class="search-input" type="text" id="archive-search" placeholder="Search archive by order no., fabric, lining or remarks…" oninput="renderArchive()" autocomplete="off">
+        <input class="search-input" type="text" id="archive-search" placeholder="Search archive by order no., fabric, lining or remarks…" oninput="renderArchive()" onkeypress="if(event.key==='Enter') renderArchive();" autocomplete="off">
+        <button class="search-clear-btn" id="archive-search-clear" onclick="clearArchiveSearch()" style="display:none;">✕</button>
       </div>
       <div class="filter-bar">
         <span class="filter-label">Sort by</span>
@@ -446,6 +447,9 @@
         } else {
           renderArchive();
         }
+        // Also render the hidden tab so it's ready (search terms are read from DOM inputs each render)
+        if (currentTab === 'orders') renderArchive();
+        else renderOrders();
         
         if (btn) btn.textContent = '🔄 Refresh';
         showToast('✓ Data loaded');
@@ -510,7 +514,15 @@
       updateProductFilterButtons();
     }, 500);
   };
-  window.addEventListener('focus', fetchOrdersFromServer);
+  // Auto-refresh on window focus (only if no active search to avoid disrupting search input)
+  window.addEventListener('focus', function() {
+    var orderSearch = document.getElementById('order-search');
+    var archiveSearch = document.getElementById('archive-search');
+    var hasActiveSearch = (orderSearch && orderSearch.value.trim()) || (archiveSearch && archiveSearch.value.trim());
+    if (!hasActiveSearch) {
+      fetchOrdersFromServer();
+    }
+  });
 
   // ==========================================
   // VARIABLES & DATA
@@ -1001,6 +1013,11 @@
 
   function renderArchive() {
     var el = document.getElementById('archive-content'); var searchEl = document.getElementById('archive-search'); var searchTerm = searchEl ? searchEl.value.trim().toLowerCase() : '';
+    
+    // Show/hide archive search clear button
+    var archiveClear = document.getElementById('archive-search-clear');
+    if (archiveClear) archiveClear.style.display = searchTerm ? 'block' : 'none';
+    
     var filtered = archivedOrders.map(function(o,i){return {order:o, origIdx:i};}).filter(function(e){
       var o = e.order; if(!searchTerm) return true;
       if(o.orderNum.toLowerCase().indexOf(searchTerm)!==-1 || (o.remarks||'').toLowerCase().indexOf(searchTerm)!==-1) return true;
@@ -1133,6 +1150,12 @@
     document.getElementById('order-search').value = '';
     document.getElementById('search-clear').style.display = 'none';
     renderOrders();
+  }
+  
+  function clearArchiveSearch() {
+    document.getElementById('archive-search').value = '';
+    document.getElementById('archive-search-clear').style.display = 'none';
+    renderArchive();
   }
   
   function updateStatusFilterButtons() {

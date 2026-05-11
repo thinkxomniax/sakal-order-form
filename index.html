@@ -626,7 +626,7 @@
     if (!tlEditingExisting) orders[tlPendingOi].fitted=tlPendingNext;
     if (!orders[tlPendingOi].fittedDates) orders[tlPendingOi].fittedDates={};
     orders[tlPendingOi].fittedDates[tlPendingNext]=dateVal;
-    closeTlModal(); renderOrders(); syncToServer(orders[tlPendingOi]);
+    var _oi=tlPendingOi; closeTlModal(); renderOrders(); syncToServer(orders[_oi]);
   }
   function deleteTlDot(oi,level) {
     if (!orders[oi].fittedDates) orders[oi].fittedDates={};

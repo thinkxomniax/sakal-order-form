@@ -420,6 +420,7 @@
 
   // ── API SYNC ──
   async function syncToServer(orderData, isDelete) {
+    if (!orderData || !orderData.orderNum) { console.warn("syncToServer: invalid orderData", orderData); return; }
     isDelete = isDelete || false;
     showToast(isDelete ? 'Deleting...' : 'Saving...');
     saveToLocalStorage();

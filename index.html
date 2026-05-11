@@ -425,8 +425,10 @@
     saveToLocalStorage();
     try {
       var payload = isDelete ? {action:'DELETE', orderNum: orderData.orderNum} : orderData;
-      var r = await fetch(API_URL, {method:'POST', body:JSON.stringify(payload), headers:{'Content-Type':'text/plain;charset=utf-8'}});
-      var result = await r.json();
+      var r = await fetch(API_URL, {method:'POST', body:JSON.stringify(payload), headers:{'Content-Type':'text/plain;charset=utf-8'}, redirect:'follow'});
+      var text = await r.text();
+      var result = {};
+      try { result = JSON.parse(text); } catch(_) { result = {status: text.includes('success') ? 'success' : 'error'}; }
       showToast(result.status==='success' ? (isDelete?'✓ Deleted':'✓ Saved') : '⚠️ Local save only (API error)');
     } catch(err) { console.error('Sync error:',err); showToast('✓ Saved locally (offline)'); }
   }

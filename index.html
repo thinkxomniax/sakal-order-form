@@ -437,8 +437,8 @@
     var btn = document.getElementById('save-fab');
     if (btn) btn.textContent = '⏳ Syncing...';
     try {
-      var r = await fetch(API_URL);
-      var result = await r.json();
+      var r = await fetch(API_URL, {redirect: 'follow'});
+      var _t = await r.text(); var result = {}; try { result = JSON.parse(_t); } catch(_){ result = {status:_t.includes("success")?"success":"error"}; }
       if (result.status === 'success') {
         orders = []; archivedOrders = [];
         (result.data || []).forEach(function(o) {

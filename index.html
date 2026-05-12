@@ -135,6 +135,17 @@
   .search-input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(28,28,48,0.09); }
   .search-clear-btn { position: absolute; right: 12px; top: 50%; transform: translateY(-50%); background: none; border: none; color: var(--text-muted); cursor: pointer; font-size: 16px; padding: 4px 8px; transition: color 0.15s; }
   .search-clear-btn:hover { color: var(--text); }
+  .confirm-modal-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.55); z-index:300; align-items:center; justify-content:center; padding:1rem; backdrop-filter:blur(4px); }
+  .confirm-modal-overlay.open { display:flex; }
+  .confirm-modal { background:var(--surface); border-radius:18px; padding:32px 28px 24px; width:380px; max-width:95vw; box-shadow:0 24px 80px rgba(0,0,0,0.3); text-align:center; }
+  .confirm-modal-icon { font-size:40px; margin-bottom:12px; display:block; }
+  .confirm-modal-title { font-family:'Helvetica Neue',sans-serif; font-size:18px; font-weight:700; color:var(--text); margin-bottom:10px; }
+  .confirm-modal-msg { font-size:14px; color:var(--text-muted); font-family:'Helvetica Neue',sans-serif; margin-bottom:24px; line-height:1.6; }
+  .confirm-modal-actions { display:flex; gap:10px; justify-content:center; }
+  .confirm-cancel-btn { height:48px; padding:0 24px; border-radius:12px; font-family:'Helvetica Neue',sans-serif; font-size:14px; cursor:pointer; border:1.5px solid var(--border-strong); background:var(--surface); color:var(--text-muted); transition:all 0.15s; }
+  .confirm-cancel-btn:hover { background:var(--surface2); }
+  .confirm-action-btn { height:48px; padding:0 28px; border-radius:12px; font-family:'Helvetica Neue',sans-serif; font-size:14px; font-weight:600; cursor:pointer; border:1.5px solid; color:#fff; transition:all 0.15s; }
+  .confirm-action-btn:hover { opacity:0.88; transform:scale(0.98); }
   @media screen and (max-width: 1024px) {
     .workspace { display: block; }
     .left-panel { width: 100%; min-width: 100%; height: auto; position: relative; overflow-y: visible; border-right: none; border-bottom: 1px solid var(--border-strong); padding: 1.5rem; }
@@ -233,6 +244,32 @@
         <button class="sort-btn product-filter-btn" data-product="Safari Jacket" onclick="toggleProductFilter('Safari Jacket')">Safari Jacket</button>
         <button class="sort-btn product-filter-btn" data-product="Overcoat"      onclick="toggleProductFilter('Overcoat')">Overcoat</button>
       </div>
+      <div class="filter-bar" style="margin-bottom:0.5rem;">
+        <span class="filter-label">Date</span>
+        <button class="sort-btn" id="filter-date-toggle" onclick="toggleDateFilterPanel()">📅 Filter by Date</button>
+        <button class="sort-btn" id="filter-date-clear" onclick="clearDateFilter()" style="display:none;">✕ Clear Date</button>
+      </div>
+      <div id="date-filter-panel" style="display:none;background:var(--surface);border:1.5px solid var(--border-strong);border-radius:var(--radius-sm);padding:14px 16px;margin-bottom:0.75rem;">
+        <div style="display:flex;flex-wrap:wrap;gap:12px;align-items:flex-end;">
+          <div style="display:flex;flex-direction:column;gap:4px;">
+            <span style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--text-faint);font-family:'Helvetica Neue',sans-serif;">Ordered From</span>
+            <input type="date" id="filter-ordered-from" style="height:38px;padding:0 10px;border:1.5px solid var(--border-strong);border-radius:8px;font-size:13px;font-family:inherit;color:var(--text);background:var(--surface);outline:none;" oninput="applyDateFilter()">
+          </div>
+          <div style="display:flex;flex-direction:column;gap:4px;">
+            <span style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--text-faint);font-family:'Helvetica Neue',sans-serif;">Ordered To</span>
+            <input type="date" id="filter-ordered-to" style="height:38px;padding:0 10px;border:1.5px solid var(--border-strong);border-radius:8px;font-size:13px;font-family:inherit;color:var(--text);background:var(--surface);outline:none;" oninput="applyDateFilter()">
+          </div>
+          <div style="width:1px;height:38px;background:var(--border-strong);flex-shrink:0;"></div>
+          <div style="display:flex;flex-direction:column;gap:4px;">
+            <span style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--text-faint);font-family:'Helvetica Neue',sans-serif;">Due Date From</span>
+            <input type="date" id="filter-due-from" style="height:38px;padding:0 10px;border:1.5px solid var(--border-strong);border-radius:8px;font-size:13px;font-family:inherit;color:var(--text);background:var(--surface);outline:none;" oninput="applyDateFilter()">
+          </div>
+          <div style="display:flex;flex-direction:column;gap:4px;">
+            <span style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--text-faint);font-family:'Helvetica Neue',sans-serif;">Due Date To</span>
+            <input type="date" id="filter-due-to" style="height:38px;padding:0 10px;border:1.5px solid var(--border-strong);border-radius:8px;font-size:13px;font-family:inherit;color:var(--text);background:var(--surface);outline:none;" oninput="applyDateFilter()">
+          </div>
+        </div>
+      </div>
       <div class="filter-bar" style="margin-bottom:1rem">
         <span class="filter-label">Filter</span>
         <button class="sort-btn status-filter-btn" data-status="Fabric Ordered" id="filter-fabricordered" onclick="toggleStatusFilter('Fabric Ordered')">Fabric Ordered</button>
@@ -256,13 +293,38 @@
       </div>
       <div class="filter-bar">
         <span class="filter-label">Sort by</span>
-        <button class="sort-btn active" data-archive-sort="default" onclick="toggleArchiveSort()">Oldest First</button>
+        <button class="sort-btn active" data-archive-sort="newest" onclick="setArchiveSort('newest')">Newest First</button>
+        <button class="sort-btn" data-archive-sort="oldest" onclick="setArchiveSort('oldest')">Oldest First</button>
         <div class="filter-divider"></div>
         <span class="filter-label">Due Date</span>
         <button class="sort-btn" data-archive-sort="due-asc" onclick="toggleArchiveDueSort()">↑ Earliest</button>
         <div class="filter-divider"></div>
         <span class="filter-label">Fitting Date</span>
         <button class="sort-btn" data-archive-sort="fit-asc" onclick="toggleArchiveFitSort()">↑ Earliest</button>
+        <div class="filter-divider"></div>
+        <button class="sort-btn" id="arc-filter-date-toggle" onclick="toggleArchiveDateFilterPanel()">📅 Filter by Date</button>
+      </div>
+      <div id="archive-date-filter-panel" style="display:none;background:var(--surface);border:1.5px solid var(--border-strong);border-radius:var(--radius-sm);padding:14px 16px;margin-bottom:0.75rem;">
+        <div style="display:flex;flex-wrap:wrap;gap:12px;align-items:flex-end;">
+          <div style="display:flex;flex-direction:column;gap:4px;"><span style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--text-faint);font-family:'Helvetica Neue',sans-serif;">Ordered From</span><input type="date" id="arc-filter-ordered-from" style="height:38px;padding:0 10px;border:1.5px solid var(--border-strong);border-radius:8px;font-size:13px;font-family:inherit;color:var(--text);background:var(--surface);outline:none;" oninput="applyArchiveDateFilter()"></div>
+          <div style="display:flex;flex-direction:column;gap:4px;"><span style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--text-faint);font-family:'Helvetica Neue',sans-serif;">Ordered To</span><input type="date" id="arc-filter-ordered-to" style="height:38px;padding:0 10px;border:1.5px solid var(--border-strong);border-radius:8px;font-size:13px;font-family:inherit;color:var(--text);background:var(--surface);outline:none;" oninput="applyArchiveDateFilter()"></div>
+          <div style="width:1px;height:38px;background:var(--border-strong);flex-shrink:0;"></div>
+          <div style="display:flex;flex-direction:column;gap:4px;"><span style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--text-faint);font-family:'Helvetica Neue',sans-serif;">Due Date From</span><input type="date" id="arc-filter-due-from" style="height:38px;padding:0 10px;border:1.5px solid var(--border-strong);border-radius:8px;font-size:13px;font-family:inherit;color:var(--text);background:var(--surface);outline:none;" oninput="applyArchiveDateFilter()"></div>
+          <div style="display:flex;flex-direction:column;gap:4px;"><span style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--text-faint);font-family:'Helvetica Neue',sans-serif;">Due Date To</span><input type="date" id="arc-filter-due-to" style="height:38px;padding:0 10px;border:1.5px solid var(--border-strong);border-radius:8px;font-size:13px;font-family:inherit;color:var(--text);background:var(--surface);outline:none;" oninput="applyArchiveDateFilter()"></div>
+          <button class="sort-btn" onclick="clearArchiveDateFilter()">✕ Clear</button>
+        </div>
+      </div>
+      <div class="filter-bar" id="archive-date-filter-bar" style="margin-bottom:0.75rem;display:none;">
+        <span class="filter-label">Ordered</span>
+        <input type="date" id="arc-filter-ordered-from" class="sort-btn" style="padding:0 8px;font-family:'Helvetica Neue',sans-serif;font-size:12px;" oninput="applyArchiveDateFilter()">
+        <span style="font-size:11px;color:var(--text-faint)">→</span>
+        <input type="date" id="arc-filter-ordered-to" class="sort-btn" style="padding:0 8px;font-family:'Helvetica Neue',sans-serif;font-size:12px;" oninput="applyArchiveDateFilter()">
+        <div class="filter-divider"></div>
+        <span class="filter-label">Due Date</span>
+        <input type="date" id="arc-filter-due-from" class="sort-btn" style="padding:0 8px;font-family:'Helvetica Neue',sans-serif;font-size:12px;" oninput="applyArchiveDateFilter()">
+        <span style="font-size:11px;color:var(--text-faint)">→</span>
+        <input type="date" id="arc-filter-due-to" class="sort-btn" style="padding:0 8px;font-family:'Helvetica Neue',sans-serif;font-size:12px;" oninput="applyArchiveDateFilter()">
+        <button class="sort-btn" id="arc-filter-date-clear" onclick="clearArchiveDateFilter()">✕ Clear</button>
       </div>
       <div id="archive-content"></div>
     </div>
@@ -270,6 +332,18 @@
 </div>
 
 <div class="toast" id="toast">Saved</div>
+
+<div class="confirm-modal-overlay" id="confirm-modal">
+  <div class="confirm-modal">
+    <span class="confirm-modal-icon" id="confirm-modal-icon">📦</span>
+    <div class="confirm-modal-title" id="confirm-modal-title">Archive Order?</div>
+    <div class="confirm-modal-msg" id="confirm-modal-msg"></div>
+    <div class="confirm-modal-actions">
+      <button class="confirm-cancel-btn" onclick="closeConfirmModal()">Cancel</button>
+      <button class="confirm-action-btn" id="confirm-modal-btn" style="background:#1C1C30;border-color:#1C1C30;">Archive</button>
+    </div>
+  </div>
+</div>
 
 <div class="tl-modal-overlay" id="tl-modal">
   <div class="tl-modal">
@@ -323,7 +397,7 @@
 
 <script>
   // ── API ──
-  const API_URL = 'https://script.google.com/macros/s/AKfycbxuTJ0gw_waz4fNE_JyiaehnFYbELAI_oA6MZza0VvIMULeRTAc568kte4op9gYxQna/exec';
+  const API_URL = 'https://script.google.com/macros/s/AKfycbxoX9ZNDXz0_PRr1keD_njjBo5A_ygJNQNwkZ8BmaRxiQg-H-we-PLBfDOPrhC7YhzX/exec';
 
   // ── CONSTANTS ──
   var PRODUCTS     = ['Jacket','Trousers','Shirt','Vest','Safari Jacket','Overcoat'];
@@ -340,6 +414,7 @@
   var selectedItems = [], orders = [], archivedOrders = [];
   var currentSort = 'newest', currentArchiveSort = 'newest', currentTab = 'orders';
   var activeStatusFilter = null, activeStuckFilter = false, activeUnpaidFilter = false, activeProductFilters = {};
+  var filterOrderedFrom='', filterOrderedTo='', filterDueFrom='', filterDueTo='';
   var editIdx = -1, delPendingType = '', delPendingOi = -1, delPendingIi = -1;
   var tlPendingOi = -1, tlPendingNext = 0, tlEditingExisting = false;
 
@@ -597,8 +672,45 @@
       closeDelModal(); renderOrders();
     } else if (delPendingType==='archive') { var o=archivedOrders[delPendingOi]; archivedOrders.splice(delPendingOi,1); syncToServer(o,true); closeDelModal(); renderArchive(); }
   }
-  function archiveOrder(idx) { var o=orders[idx]; o.archived=true; archivedOrders.unshift(o); orders.splice(idx,1); renderOrders(); renderArchive(); updateBadges(); syncToServer(o); showToast('Order '+o.orderNum+' archived'); }
-  function restoreOrder(ai)  { var o=archivedOrders[ai]; o.archived=false; orders.unshift(o); archivedOrders.splice(ai,1); renderOrders(); renderArchive(); updateBadges(); syncToServer(o); showToast('Order '+o.orderNum+' restored'); }
+  var archivePendingIdx = -1, restorePendingIdx = -1;
+  function archiveOrder(idx) {
+    archivePendingIdx = idx;
+    var o = orders[idx];
+    document.getElementById('confirm-modal-icon').textContent = '📦';
+    document.getElementById('confirm-modal-title').textContent = 'Archive Order?';
+    document.getElementById('confirm-modal-msg').innerHTML = 'Move order <strong>'+esc(o.orderNum)+'</strong> to archive?<br><span style="font-size:12px;color:var(--text-muted)">You can restore it anytime.</span>';
+    document.getElementById('confirm-modal-btn').textContent = 'Archive';
+    document.getElementById('confirm-modal-btn').style.background = '#1C1C30';
+    document.getElementById('confirm-modal-btn').style.borderColor = '#1C1C30';
+    document.getElementById('confirm-modal-btn').onclick = function(){ doArchive(); };
+    document.getElementById('confirm-modal').classList.add('open');
+  }
+  function doArchive() {
+    if(archivePendingIdx<0) return;
+    var o=orders[archivePendingIdx]; o.archived=true; archivedOrders.unshift(o); orders.splice(archivePendingIdx,1);
+    archivePendingIdx=-1; closeConfirmModal();
+    renderOrders(); renderArchive(); updateBadges(); syncToServer(o); showToast('Order '+o.orderNum+' archived');
+  }
+  function confirmRestore(ai) {
+    restorePendingIdx = ai;
+    var o = archivedOrders[ai];
+    document.getElementById('confirm-modal-icon').textContent = '↩';
+    document.getElementById('confirm-modal-title').textContent = 'Restore Order?';
+    document.getElementById('confirm-modal-msg').innerHTML = 'Restore order <strong>'+esc(o.orderNum)+'</strong> back to active orders?';
+    document.getElementById('confirm-modal-btn').textContent = 'Restore';
+    document.getElementById('confirm-modal-btn').style.background = '#1a8a4a';
+    document.getElementById('confirm-modal-btn').style.borderColor = '#1a8a4a';
+    document.getElementById('confirm-modal-btn').onclick = function(){ doRestore(); };
+    document.getElementById('confirm-modal').classList.add('open');
+  }
+  function doRestore() {
+    if(restorePendingIdx<0) return;
+    var o=archivedOrders[restorePendingIdx]; o.archived=false; orders.unshift(o); archivedOrders.splice(restorePendingIdx,1);
+    restorePendingIdx=-1; closeConfirmModal();
+    renderOrders(); renderArchive(); updateBadges(); syncToServer(o); showToast('Order '+o.orderNum+' restored');
+  }
+  function restoreOrder(ai) { confirmRestore(ai); }
+  function closeConfirmModal() { document.getElementById('confirm-modal').classList.remove('open'); archivePendingIdx=-1; restorePendingIdx=-1; }
 
   // ── STATUS & MODALS ──
   function toggleItemStatus(oi,ii,field) {
@@ -726,6 +838,10 @@
       if(activeStatusFilter && !items.some(function(it){ return it.status===activeStatusFilter; })) return false;
       if(activeStuckFilter  && !items.some(function(it){ return it.stuck; })) return false;
       if(activeUnpaidFilter && !items.some(function(it){ return !it.paid; })) return false;
+      if(filterOrderedFrom && (o.date||'') < filterOrderedFrom) return false;
+      if(filterOrderedTo   && (o.date||'') > filterOrderedTo)   return false;
+      if(filterDueFrom && (o.dueDate||'') < filterDueFrom) return false;
+      if(filterDueTo   && (o.dueDate||'') > filterDueTo)   return false;
       if(searchTerm) {
         if(String(o.orderNum||'').toLowerCase().indexOf(searchTerm)!==-1) return true;
         if((o.remarks||'').toLowerCase().indexOf(searchTerm)!==-1) return true;
@@ -735,18 +851,8 @@
       return true;
     });
 
-    if(currentSort==='newest') {
-      filtered.sort(function(a,b){
-        var dateCompare = (b.order.date||'').localeCompare(a.order.date||'');
-        return dateCompare !== 0 ? dateCompare : (b.order.orderNum||'').localeCompare(a.order.orderNum||'');
-      });
-    }
-    else if(currentSort==='oldest') {
-      filtered.sort(function(a,b){
-        var dateCompare = (a.order.date||'').localeCompare(b.order.date||'');
-        return dateCompare !== 0 ? dateCompare : (a.order.orderNum||'').localeCompare(b.order.orderNum||'');
-      });
-    }
+    if(currentSort==='newest')    filtered.sort(function(a,b){ return (b.order.orderNum||'').localeCompare(a.order.orderNum||'',undefined,{numeric:true}); });
+    else if(currentSort==='oldest') filtered.sort(function(a,b){ return (a.order.orderNum||'').localeCompare(b.order.orderNum||'',undefined,{numeric:true}); });
     else if(currentSort==='due-asc')  filtered.sort(function(a,b){ return (a.order.dueDate||'9999').localeCompare(b.order.dueDate||'9999'); });
     else if(currentSort==='due-desc') filtered.sort(function(a,b){ return (b.order.dueDate||'9999').localeCompare(a.order.dueDate||'9999'); });
     else if(currentSort==='fit-asc')  filtered.sort(function(a,b){ return (a.order.fittingDate||'9999').localeCompare(b.order.fittingDate||'9999'); });
@@ -784,6 +890,22 @@
     el.innerHTML=html; updateBadges();
   }
 
+  function fittedDotsHtmlArchive(ai) {
+    var o=archivedOrders[ai], fitted=o.fitted||0, fd=o.fittedDates||{};
+    var html='<div style="display:flex;align-items:flex-end;gap:6px;flex-direction:column">';
+    html+='<div style="display:flex;gap:6px;align-items:center">';
+    [1,2,3].forEach(function(lvl){
+      var color=lvl===1?'red':lvl===2?'amber':'green';
+      var active=fitted>=lvl;
+      html+='<div style="display:flex;flex-direction:column;align-items:center;gap:2px">';
+      html+='<div class="fitted-dot '+(active?color:'off')+'" style="cursor:default"></div>';
+      if(active&&fd[lvl]) html+='<span style="font-size:9px;color:var(--text-faint);font-family:Helvetica Neue,sans-serif;white-space:nowrap;">'+formatDisplayDate(fd[lvl])+'</span>';
+      html+='</div>';
+    });
+    html+='</div></div>';
+    return html;
+  }
+
   // ── RENDER ARCHIVE ──
   function renderArchive() {
     var el=document.getElementById('archive-content');
@@ -792,24 +914,19 @@
     var clearBtn=document.getElementById('archive-search-clear'); if(clearBtn) clearBtn.style.display=searchTerm?'block':'none';
 
     var filtered=archivedOrders.map(function(o,i){ return {order:o,origIdx:i}; }).filter(function(e){
-      var o=e.order; if(!searchTerm) return true;
+      var o=e.order;
+      if(arcFilterOrderedFrom && (o.date||'') < arcFilterOrderedFrom) return false;
+      if(arcFilterOrderedTo   && (o.date||'') > arcFilterOrderedTo)   return false;
+      if(arcFilterDueFrom && (o.dueDate||'') < arcFilterDueFrom) return false;
+      if(arcFilterDueTo   && (o.dueDate||'') > arcFilterDueTo)   return false;
+      if(!searchTerm) return true;
       if(String(o.orderNum||'').toLowerCase().indexOf(searchTerm)!==-1) return true;
       if((o.remarks||'').toLowerCase().indexOf(searchTerm)!==-1) return true;
       return (o.items||[]).some(function(it){ return (it.fabric||'').toLowerCase().indexOf(searchTerm)!==-1||(it.lining||'').toLowerCase().indexOf(searchTerm)!==-1; });
     });
 
-    if(currentArchiveSort==='newest') {
-      filtered.sort(function(a,b){
-        var dateCompare = (b.order.date||'').localeCompare(a.order.date||'');
-        return dateCompare !== 0 ? dateCompare : (b.order.orderNum||'').localeCompare(a.order.orderNum||'');
-      });
-    }
-    else if(currentArchiveSort==='oldest') {
-      filtered.sort(function(a,b){
-        var dateCompare = (a.order.date||'').localeCompare(b.order.date||'');
-        return dateCompare !== 0 ? dateCompare : (a.order.orderNum||'').localeCompare(b.order.orderNum||'');
-      });
-    }
+    if(currentArchiveSort==='newest')    filtered.sort(function(a,b){ return (b.order.orderNum||'').localeCompare(a.order.orderNum||'',undefined,{numeric:true}); });
+    else if(currentArchiveSort==='oldest') filtered.sort(function(a,b){ return (a.order.orderNum||'').localeCompare(b.order.orderNum||'',undefined,{numeric:true}); });
     else if(currentArchiveSort==='due-asc')  filtered.sort(function(a,b){ return (a.order.dueDate||'9999').localeCompare(b.order.dueDate||'9999'); });
     else if(currentArchiveSort==='due-desc') filtered.sort(function(a,b){ return (b.order.dueDate||'9999').localeCompare(a.order.dueDate||'9999'); });
     else if(currentArchiveSort==='fit-asc')  filtered.sort(function(a,b){ return (a.order.fittingDate||'9999').localeCompare(b.order.fittingDate||'9999'); });
@@ -855,6 +972,50 @@
   function toggleArchiveFitSort() { setArchiveSort(currentArchiveSort==='fit-asc'?'fit-desc':'fit-asc'); }
   function updateSortButtons() { document.querySelectorAll('[data-sort]').forEach(function(b){ b.classList.remove('active'); }); var a=document.querySelector('[data-sort="'+currentSort+'"]'); if(a) a.classList.add('active'); }
   function updateArchiveSortButtons() { document.querySelectorAll('[data-archive-sort]').forEach(function(b){ b.classList.remove('active'); }); var a=document.querySelector('[data-archive-sort="'+currentArchiveSort+'"]'); if(a) a.classList.add('active'); }
+  var arcFilterOrderedFrom='', arcFilterOrderedTo='', arcFilterDueFrom='', arcFilterDueTo='';
+  var dateFilterPanelOpen = false;
+  function toggleDateFilterPanel() {
+    dateFilterPanelOpen = !dateFilterPanelOpen;
+    var p = document.getElementById('date-filter-panel');
+    var b = document.getElementById('filter-date-toggle');
+    if(p) p.style.display = dateFilterPanelOpen ? 'block' : 'none';
+    if(b) b.classList.toggle('active', dateFilterPanelOpen);
+  }
+  var archiveDateFilterOpen = false;
+  function toggleArchiveDateFilterPanel() {
+    archiveDateFilterOpen = !archiveDateFilterOpen;
+    var p = document.getElementById('archive-date-filter-panel');
+    var b = document.getElementById('arc-filter-date-toggle');
+    if(p) p.style.display = archiveDateFilterOpen ? 'block' : 'none';
+    if(b) b.classList.toggle('active', archiveDateFilterOpen);
+  }
+  function applyArchiveDateFilter() {
+    arcFilterOrderedFrom = (document.getElementById('arc-filter-ordered-from')||{}).value||'';
+    arcFilterOrderedTo   = (document.getElementById('arc-filter-ordered-to')||{}).value||'';
+    arcFilterDueFrom     = (document.getElementById('arc-filter-due-from')||{}).value||'';
+    arcFilterDueTo       = (document.getElementById('arc-filter-due-to')||{}).value||'';
+    renderArchive();
+  }
+  function clearArchiveDateFilter() {
+    arcFilterOrderedFrom=arcFilterOrderedTo=arcFilterDueFrom=arcFilterDueTo='';
+    ['arc-filter-ordered-from','arc-filter-ordered-to','arc-filter-due-from','arc-filter-due-to'].forEach(function(id){ var el=document.getElementById(id); if(el) el.value=''; });
+    renderArchive();
+  }
+  function applyDateFilter() {
+    filterOrderedFrom = (document.getElementById('filter-ordered-from')||{}).value||'';
+    filterOrderedTo   = (document.getElementById('filter-ordered-to')||{}).value||'';
+    filterDueFrom     = (document.getElementById('filter-due-from')||{}).value||'';
+    filterDueTo       = (document.getElementById('filter-due-to')||{}).value||'';
+    var hasFilter = filterOrderedFrom||filterOrderedTo||filterDueFrom||filterDueTo;
+    var cb = document.getElementById('filter-date-clear'); if(cb) cb.style.display=hasFilter?'inline-flex':'none';
+    renderOrders();
+  }
+  function clearDateFilter() {
+    filterOrderedFrom=filterOrderedTo=filterDueFrom=filterDueTo='';
+    ['filter-ordered-from','filter-ordered-to','filter-due-from','filter-due-to'].forEach(function(id){ var el=document.getElementById(id); if(el) el.value=''; });
+    var cb=document.getElementById('filter-date-clear'); if(cb) cb.style.display='none';
+    renderOrders();
+  }
   function toggleProductFilter(p) { activeProductFilters[p]=!activeProductFilters[p]; updateProductFilterButtons(); renderOrders(); }
   function updateProductFilterButtons() { document.querySelectorAll('.product-filter-btn').forEach(function(btn){ btn.classList.toggle('active',!!activeProductFilters[btn.getAttribute('data-product')]); }); }
   function toggleStatusFilter(status) {

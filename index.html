@@ -417,6 +417,7 @@
   var filterOrderedFrom='', filterOrderedTo='', filterDueFrom='', filterDueTo='';
   var editIdx = -1, delPendingType = '', delPendingOi = -1, delPendingIi = -1;
   var tlPendingOi = -1, tlPendingNext = 0, tlEditingExisting = false;
+  var arcTlPendingIdx = -1, arcTlPendingNext = 0, arcTlEditingExisting = false;
 
   // ── DATE HELPERS ──
   // parseToYMD: converts ANY date format → 'yyyy-MM-dd' string
@@ -730,11 +731,23 @@
     var t=new Date(); document.getElementById('tl-date-input').value=t.getFullYear()+'-'+String(t.getMonth()+1).padStart(2,'0')+'-'+String(t.getDate()).padStart(2,'0');
     document.getElementById('tl-modal').classList.add('open');
   }
-  function closeTlModal() { document.getElementById('tl-modal').classList.remove('open'); tlPendingOi=-1; }
+  function closeTlModal() { document.getElementById('tl-modal').classList.remove('open'); tlPendingOi=-1; tlPendingNext=0; tlEditingExisting=false; arcTlPendingIdx=-1; arcTlPendingNext=0; arcTlEditingExisting=false; }
   function saveTlModal() {
-    if (tlPendingOi<0) return;
     var dateVal=document.getElementById('tl-date-input').value;
     if (!dateVal) { showToast('Please enter a date'); return; }
+
+    // Archive mode
+    if(arcTlPendingIdx>=0) {
+      var ao=archivedOrders[arcTlPendingIdx];
+      if(!ao.fittedDates) ao.fittedDates={};
+      if(!arcTlEditingExisting) ao.fitted=arcTlPendingNext;
+      ao.fittedDates[arcTlPendingNext]=dateVal;
+      var _ai=arcTlPendingIdx; closeTlModal(); renderArchive(); syncToServer(archivedOrders[_ai]);
+      return;
+    }
+
+    // Orders mode
+    if (tlPendingOi<0) return;
     if (!tlEditingExisting) orders[tlPendingOi].fitted=tlPendingNext;
     if (!orders[tlPendingOi].fittedDates) orders[tlPendingOi].fittedDates={};
     orders[tlPendingOi].fittedDates[tlPendingNext]=dateVal;
@@ -744,6 +757,32 @@
     if (!orders[oi].fittedDates) orders[oi].fittedDates={};
     for (var l=level;l<=3;l++) delete orders[oi].fittedDates[l];
     orders[oi].fitted=level-1; renderOrders(); syncToServer(orders[oi]);
+  }
+  // ── ARCHIVE FITTED DOT FUNCTIONS ──
+  function toggleArchiveFitted(ai) {
+    if(!archivedOrders[ai]) return;
+    var o=archivedOrders[ai];
+    if(!o.fittedDates) o.fittedDates={};
+    var nextLevel=(o.fitted||0)+1;
+    if(nextLevel>3) return;
+    arcTlPendingIdx=ai; arcTlPendingNext=nextLevel; arcTlEditingExisting=false;
+    document.getElementById('tl-modal-title').innerHTML='<span class="tl-dot-preview '+TL_COLORS[nextLevel]+'"></span>'+esc(TL_LABELS[nextLevel]);
+    document.getElementById('tl-date-input').value='';
+    document.getElementById('tl-modal').classList.add('open');
+  }
+  function editArcTlDate(ai,level) {
+    arcTlPendingIdx=ai; arcTlPendingNext=level; arcTlEditingExisting=true;
+    document.getElementById('tl-modal-title').innerHTML='<span class="tl-dot-preview '+TL_COLORS[level]+'"></span>'+esc(TL_LABELS[level]);
+    document.getElementById('tl-date-input').value=(archivedOrders[ai].fittedDates||{})[level]||'';
+    document.getElementById('tl-modal').classList.add('open');
+  }
+  function deleteArcTlDot(ai,level) {
+    if(!archivedOrders[ai]) return;
+    var o=archivedOrders[ai];
+    if(!o.fittedDates) o.fittedDates={};
+    for(var l=level;l<=3;l++) delete o.fittedDates[l];
+    o.fitted=level-1;
+    renderArchive(); syncToServer(o);
   }
   function editTlDate(oi,level) {
     tlPendingOi=oi; tlPendingNext=level; tlEditingExisting=true;
@@ -891,19 +930,22 @@
   }
 
   function fittedDotsHtmlArchive(ai) {
-    var o=archivedOrders[ai], fitted=o.fitted||0, fd=o.fittedDates||{};
-    var html='<div style="display:flex;align-items:flex-end;gap:6px;flex-direction:column">';
-    html+='<div style="display:flex;gap:6px;align-items:center">';
-    [1,2,3].forEach(function(lvl){
-      var color=lvl===1?'red':lvl===2?'amber':'green';
-      var active=fitted>=lvl;
-      html+='<div style="display:flex;flex-direction:column;align-items:center;gap:2px">';
-      html+='<div class="fitted-dot '+(active?color:'off')+'" style="cursor:default"></div>';
-      if(active&&fd[lvl]) html+='<span style="font-size:9px;color:var(--text-faint);font-family:Helvetica Neue,sans-serif;white-space:nowrap;">'+formatDisplayDate(fd[lvl])+'</span>';
-      html+='</div>';
-    });
-    html+='</div></div>';
-    return html;
+    var o=archivedOrders[ai];
+    if(!o) return '';
+    var fitted=o.fitted||0, fittedDates=o.fittedDates||{};
+    var colors=['red','amber','green'], labels=['Baste Fitting','Fitting','Final / Take Home'];
+    var html='<div style="display:flex;gap:8px;align-items:flex-start">';
+    for (var k=0;k<3;k++) {
+      var level=k+1, isLit=k<fitted, isNext=level===fitted+1;
+      var dateStr=fittedDates[level]?formatDisplayDate(fittedDates[level]):'';
+      var click=isLit?'onclick="event.stopPropagation();editArcTlDate('+ai+','+level+')"':(isNext?'onclick="event.stopPropagation();toggleArchiveFitted('+ai+')"':'');
+      html+='<div style="display:flex;flex-direction:column;align-items:center;gap:3px;cursor:'+(isLit||isNext?'pointer':'default')+'" '+click+'>'
+        +'<div class="fitted-dot '+(isLit?colors[k]:'off')+'"></div>'
+        +(dateStr?'<span style="font-size:9px;color:var(--text-muted);white-space:nowrap;max-width:52px;text-align:center">'+esc(dateStr)+'</span>':'<span style="font-size:9px;color:transparent">·</span>')
+        +(isLit?'<button class="tl-delete-btn" onclick="event.stopPropagation();deleteArcTlDot('+ai+','+level+')">✕</button>':'')
+        +'</div>';
+    }
+    return html+'</div>';
   }
 
   // ── RENDER ARCHIVE ──
@@ -943,8 +985,8 @@
         +'<div class="hdr-date-group"><span class="hdr-date-label">Ordered</span><span class="hdr-date-val">'+esc(dOrd)+'</span></div>'
         +'<div class="hdr-date-group"><span class="hdr-date-label">Due Date</span><span class="hdr-date-val">'+esc(dDue)+'</span></div>'
         +'<div class="hdr-date-group"><span class="hdr-date-label">Fitting Date</span><span class="hdr-date-val">'+esc(dFit)+'</span></div>'
-        +'</div><div class="order-summary-right">'
-        +'<button class="restore-btn" onclick="restoreOrder('+ai+')">↩ Restore</button>'
+        +'</div><div class="order-summary-right" onclick="event.stopPropagation()">'+fittedDotsHtmlArchive(ai)
+        +'<button class="restore-btn" onclick="confirmRestore('+ai+')">↩ Restore</button>'
         +'<div class="delete-btn" onclick="deleteArchiveOrder('+ai+')">✕</div>'
         +'</div></div><div class="order-detail">';
       items.forEach(function(it,ii){

@@ -814,7 +814,7 @@
     orders[editIdx].fittingDate=document.getElementById('modal-fittingdate').value;
     orders[editIdx].remarks=document.getElementById('modal-remarks').value.trim();
     orders[editIdx].items=getModalItems();
-    closeEditModal(); renderOrders(); syncToServer(orders[editIdx]);
+    var _ei=editIdx; closeEditModal(); renderOrders(); syncToServer(orders[_ei]);
   }
   function renderModalItems(items) {
     var grid=document.getElementById('modal-items-container');

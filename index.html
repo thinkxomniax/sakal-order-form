@@ -491,6 +491,10 @@
     o.date        = parseToYMD(o.date);
     o.dueDate     = parseToYMD(o.dueDate);
     o.fittingDate = parseToYMD(o.fittingDate);
+    o.remarks     = typeof o.remarks === 'string' ? o.remarks : '';
+    o.fitted      = typeof o.fitted === 'number' ? o.fitted : 0;
+    o.fittedDates = (o.fittedDates && typeof o.fittedDates === 'object') ? o.fittedDates : {};
+    o.archived    = o.archived === true || o.archived === 'true';
     return o;
   }
 
@@ -883,7 +887,7 @@
       if(filterDueTo   && (o.dueDate||'') > filterDueTo)   return false;
       if(searchTerm) {
         if(String(o.orderNum||'').toLowerCase().indexOf(searchTerm)!==-1) return true;
-        if((o.remarks||'').toLowerCase().indexOf(searchTerm)!==-1) return true;
+        if(String(o.remarks||'').toLowerCase().indexOf(searchTerm)!==-1) return true;
         if(items.some(function(it){ return (it.fabric||'').toLowerCase().indexOf(searchTerm)!==-1||(it.lining||'').toLowerCase().indexOf(searchTerm)!==-1; })) return true;
         return false;
       }
@@ -963,7 +967,7 @@
       if(arcFilterDueTo   && (o.dueDate||'') > arcFilterDueTo)   return false;
       if(!searchTerm) return true;
       if(String(o.orderNum||'').toLowerCase().indexOf(searchTerm)!==-1) return true;
-      if((o.remarks||'').toLowerCase().indexOf(searchTerm)!==-1) return true;
+      if(String(o.remarks||'').toLowerCase().indexOf(searchTerm)!==-1) return true;
       return (o.items||[]).some(function(it){ return (it.fabric||'').toLowerCase().indexOf(searchTerm)!==-1||(it.lining||'').toLowerCase().indexOf(searchTerm)!==-1; });
     });
 

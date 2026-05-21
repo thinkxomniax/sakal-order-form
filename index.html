@@ -399,7 +399,8 @@
 
 <script>
   // ── API ──
-  const API_URL = 'https://script.google.com/macros/s/AKfycbzlrMSQbFNAbCzGjHQVkbFG6Gr6zPc3d1RPO0GOV2ErrXGrydyFBFuCa6NvAF41Vkk5/exec';
+  const API_URL = 'https://script.google.com/macros/s/AKfycbzlrMSQbFNAbCzGjHQVkbFG6Gr6zPc3d1RPO0GOV2ErrXGrydyFBFuCa6NvAF41Vkk5/exec'
+';
 
   // ── CONSTANTS ──
   var PRODUCTS     = ['Jacket','Trousers','Shirt','Vest','Safari Jacket','Overcoat'];
@@ -503,16 +504,38 @@
 
   // ── API SYNC ──
   var lastSyncTime = 0;
-  async function syncToServer(orderData, isDelete) {
+  var syncTimers = {}; // debounce timer per order
+
+  function syncToServer(orderData, isDelete) {
     if (!orderData || !orderData.orderNum) { console.warn("syncToServer: invalid orderData", orderData); return; }
     isDelete = isDelete || false;
-    showToast(isDelete ? 'Deleting...' : 'Saving...');
     saveToLocalStorage();
     lastSyncTime = Date.now();
-    // ✅ Tambah timestamp saat kirim supaya GAS tahu kapan data ini ditulis
-    var payload = isDelete
-      ? {action:'DELETE', orderNum: orderData.orderNum}
-      : Object.assign({}, orderData, {lastUpdated: new Date().toISOString()});
+
+    // DELETE → langsung kirim, tidak perlu debounce
+    if (isDelete) {
+      showToast('Deleting...');
+      _doSync({action:'DELETE', orderNum: orderData.orderNum}, true);
+      return;
+    }
+
+    // SAVE/UPDATE → debounce 1.5 detik per order
+    // Kalau ada toggle lagi sebelum 1.5 detik, timer di-reset
+    var key = orderData.orderNum;
+    showToast('Saving...');
+    if (syncTimers[key]) clearTimeout(syncTimers[key]);
+    syncTimers[key] = setTimeout(function() {
+      delete syncTimers[key];
+      // Ambil data terbaru dari orders array (bukan dari closure)
+      // supaya semua toggle yang cepet tadi ikut ke-capture
+      var latest = orders.find(function(o){ return o.orderNum === key; })
+                || archivedOrders.find(function(o){ return o.orderNum === key; });
+      if (!latest) return;
+      _doSync(Object.assign({}, latest, {lastUpdated: new Date().toISOString()}), false);
+    }, 1500);
+  }
+
+  async function _doSync(payload, isDelete) {
     try {
       var r = await fetch(API_URL, {method:'POST', body:JSON.stringify(payload), headers:{'Content-Type':'text/plain;charset=utf-8'}, redirect:'follow'});
       var text = await r.text();

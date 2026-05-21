@@ -84,6 +84,8 @@
   .status-btn.on-bin           { background: #fff4e5; border-color: #e0913a; color: #b86c10; }
   .status-btn.on-stuck         { background: #fdecea; border-color: #e74c3c; color: #c0392b; font-weight: 700; }
   .status-btn.on-invoice       { background: #1A1A2E; border-color: #1A1A2E; color: #fff; }
+  .status-btn.on-paid          { background: #1a8a4a; border-color: #1a8a4a; color: #fff; font-weight: 600; }
+  .status-btn.on-unpaid        { background: #e8472a; border-color: #c0392b; color: #fff; font-weight: 600; }
   .none-btn-active { background: var(--accent) !important; border-color: var(--accent) !important; color: #fff !important; }
   .delete-btn, .edit-btn { display: inline-flex; align-items: center; justify-content: center; width: 38px; height: 38px; border-radius: 8px; border: 1.5px solid var(--border-strong); background: var(--surface); color: var(--text-faint); font-size: 16px; cursor: pointer; transition: all 0.15s; user-select: none; -webkit-tap-highlight-color: transparent; }
   .delete-btn:active { background: #fdecea; border-color: #e74c3c; color: #e74c3c; }
@@ -397,7 +399,7 @@
 
 <script>
   // ── API ──
-  const API_URL = 'https://script.google.com/macros/s/AKfycbxoX9ZNDXz0_PRr1keD_njjBo5A_ygJNQNwkZ8BmaRxiQg-H-we-PLBfDOPrhC7YhzX/exec';
+  const API_URL = 'https://script.google.com/macros/s/AKfycbzlrMSQbFNAbCzGjHQVkbFG6Gr6zPc3d1RPO0GOV2ErrXGrydyFBFuCa6NvAF41Vkk5/exec';
 
   // ── CONSTANTS ──
   var PRODUCTS     = ['Jacket','Trousers','Shirt','Vest','Safari Jacket','Overcoat'];
@@ -405,7 +407,7 @@
   var NEEDS_LINING = ['Jacket','Vest','Overcoat'];
   var STATUS_STATES_NO_DELTA = ['','Fabric Ordered','Bin','Batam','In-store','Take Home'];
   var STATUS_STATES_NO_BATAM = ['','Fabric Ordered','Bin','Delta','In-store','Take Home'];
-  var NO_DELTA_PRODUCTS = ['Jacket','Overcoat','Vest','Safari Jacket'];
+  var NO_DELTA_PRODUCTS = ['Jacket','Overcoat','Vest'];
   var NO_BATAM_PRODUCTS = ['Shirt','Trousers'];
   var TL_LABELS = ['','Baste Fitting','Fitting','Final / Take Home'];
   var TL_COLORS = ['','red','amber','green'];
@@ -495,17 +497,23 @@
     o.fitted      = typeof o.fitted === 'number' ? o.fitted : 0;
     o.fittedDates = (o.fittedDates && typeof o.fittedDates === 'object') ? o.fittedDates : {};
     o.archived    = o.archived === true || o.archived === 'true';
+    o.lastUpdated = o.lastUpdated || '';
     return o;
   }
 
   // ── API SYNC ──
+  var lastSyncTime = 0;
   async function syncToServer(orderData, isDelete) {
     if (!orderData || !orderData.orderNum) { console.warn("syncToServer: invalid orderData", orderData); return; }
     isDelete = isDelete || false;
     showToast(isDelete ? 'Deleting...' : 'Saving...');
     saveToLocalStorage();
+    lastSyncTime = Date.now();
+    // ✅ Tambah timestamp saat kirim supaya GAS tahu kapan data ini ditulis
+    var payload = isDelete
+      ? {action:'DELETE', orderNum: orderData.orderNum}
+      : Object.assign({}, orderData, {lastUpdated: new Date().toISOString()});
     try {
-      var payload = isDelete ? {action:'DELETE', orderNum: orderData.orderNum} : orderData;
       var r = await fetch(API_URL, {method:'POST', body:JSON.stringify(payload), headers:{'Content-Type':'text/plain;charset=utf-8'}, redirect:'follow'});
       var text = await r.text();
       var result = {};
@@ -566,10 +574,12 @@
     }, 3000);
   };
 
-  // Auto-refresh on focus — skip if user is actively searching
+  // Auto-refresh on focus — skip if user is actively searching OR recently saved (within 30s)
   window.addEventListener('focus', function() {
     var oS = document.getElementById('order-search'), aS = document.getElementById('archive-search');
-    if (!((oS && oS.value.trim()) || (aS && aS.value.trim()))) fetchOrdersFromServer();
+    if ((oS && oS.value.trim()) || (aS && aS.value.trim())) return;
+    if (Date.now() - lastSyncTime < 30000) return; // skip if saved within last 30 seconds
+    fetchOrdersFromServer();
   });
 
   // ── TABS ──
@@ -924,7 +934,7 @@
           +'<div class="detail-item-actions">'
           +'<span class="status-btn '+statusClass(it.status)+'" onclick="toggleItemStatus('+oi+','+ii+',\'status\')">'+esc(it.status||'—')+'</span>'
           +'<span class="status-btn'+(it.stuck?' on-stuck':'')+'" onclick="toggleItemStatus('+oi+','+ii+',\'stuck\')">'+(it.stuck?'🔴 Stuck':'Stuck')+'</span>'
-          +'<span class="status-btn'+(it.paid?' on-paid':'')+'" onclick="toggleItemStatus('+oi+','+ii+',\'paid\')">'+(it.paid?'✓ Paid':'Unpaid')+'</span>'
+          +'<span class="status-btn'+(it.paid?' on-paid':' on-unpaid')+'" onclick="toggleItemStatus('+oi+','+ii+',\'paid\')">'+(it.paid?'✓ Paid':'Unpaid')+'</span>'
           +'<div class="delete-btn" onclick="deleteItem('+oi+','+ii+')">✕</div></div></div>';
       });
       if(o.remarks) html+='<div style="padding:6px 16px 8px;font-size:11px;color:var(--text-faint);background:var(--surface2);border-top:1px solid var(--border)">📝 '+esc(o.remarks)+'</div>';
@@ -998,7 +1008,7 @@
           +'<div class="detail-fabric-meta">Fabric: '+esc(it.fabric)+(it.lining?' · Lining: '+esc(it.lining):'')+'</div>'
           +'<div class="detail-item-actions">'
           +'<span class="status-btn '+statusClass(it.status||'Take Home')+'">'+esc(it.status||'Take Home')+'</span>'
-          +'<span class="status-btn'+(it.paid?' on-paid':'')+'" onclick="toggleArchiveItemPaid('+ai+','+ii+')">'+(it.paid?'✓ Paid':'Unpaid')+'</span>'
+          +'<span class="status-btn'+(it.paid?' on-paid':' on-unpaid')+'" onclick="toggleArchiveItemPaid('+ai+','+ii+')">'+(it.paid?'✓ Paid':'Unpaid')+'</span>'
           +'</div></div>';
       });
       if(o.remarks) html+='<div style="padding:6px 16px 8px;font-size:11px;color:var(--text-faint);background:var(--surface2);border-top:1px solid var(--border)">📝 '+esc(o.remarks)+'</div>';

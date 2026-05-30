@@ -681,13 +681,36 @@
       showToast('Please fill in all required fabric/lining fields'); onFabricInput(); return;
     }
     var remarks=document.getElementById('remarks-input').value.trim();
-    var today=new Date();
-    var dateStr=today.getFullYear()+'-'+String(today.getMonth()+1).padStart(2,'0')+'-'+String(today.getDate()).padStart(2,'0');
-    var newItems=selectedItems.map(function(item){ return {product:item.product,fabric:item.fabric,lining:item.lining,status:'',paid:false,invoice:false,stuck:false}; });
-    var newOrder={orderNum:orderNum,dueDate:dueDate,fittingDate:fittingDate,items:newItems,date:dateStr,fitted:0,remarks:remarks,archived:false};
+    
+    // 1. Ambil tanggal hari ini menggunakan local time format YYYY-MM-DD
+    var today = new Date();
+    var dateStr = today.getFullYear() + '-' + String(today.getMonth() + 1).padStart(2, '0') + '-' + String(today.getDate()).padStart(2, '0');
+    
+    // 2. Ubah status awal dari '' menjadi 'Fabric Ordered' agar langsung terisi otomatis
+    var newItems=selectedItems.map(function(item){ return {product:item.product,fabric:item.fabric,lining:item.lining,status:'Fabric Ordered',paid:false,invoice:false,stuck:false}; });
+    
+    var newOrder={
+      orderNum: orderNum,
+      dueDate: dueDate,
+      fittingDate: fittingDate,
+      items: newItems,
+      date: dateStr, // Mengisi tanggal "Ordered" secara otomatis
+      fitted: 0,
+      remarks: remarks,
+      archived: false,
+      lastUpdated: new Date().toISOString()
+    };
+    
     orders.unshift(newOrder);
     showToast('Order '+orderNum+' submitted');
+    
+    // 3. Reset form setelah submit
     ['ordernum-input','remarks-input','fittingdate-input','duedate-input'].forEach(function(id){ document.getElementById(id).value=''; });
+    
+    // Reset tombol indikator "None" ke kondisi semula
+    document.getElementById('duedate-none-btn').classList.add('none-btn-active');
+    document.getElementById('fittingdate-none-btn').classList.add('none-btn-active');
+    
     selectedItems=[]; renderFabricFields(); updateProductButtons(); renderOrders();
     syncToServer(newOrder);
   }

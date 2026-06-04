@@ -387,7 +387,7 @@
 
 <script>
   // ── API ──
-  const API_URL = 'https://script.google.com/macros/s/AKfycbzOtUxqkL_YHTK2GLkK5hSXg2ChtMGrKEIGRc6b-xQ8wtnCgTjcw_5Agfw7YL8FCcMC/exec';
+  const API_URL = 'https://script.google.com/macros/s/AKfycbzuOPh3xA4qEh_OXh2UZ_5XAw09_3oCWPYiJodASFG3sWtzhwfiqTmuYZ7vuU_Bih_b/exec';
 
   // ── CONSTANTS ──
   var PRODUCTS     = ['Jacket','Trousers','Shirt','Vest','Safari Jacket','Overcoat'];
@@ -797,11 +797,12 @@
     document.getElementById('tl-modal').classList.add('open');
   }
 
-  // FIXED: Inline Date Editor Berjalan Stabil Tanpa Merusak Struktur Object Database
+  // FIXED Bug 2b: Inline Date Editor - tambah lastUpdated agar tidak di-skip backend
   function saveInlineDate(idx,type,picker) { 
     if(!orders[idx]) return;
     if(type==='due') orders[idx].dueDate=picker.value; 
     else orders[idx].fittingDate=picker.value; 
+    orders[idx].lastUpdated=new Date().toISOString(); // FIX: force timestamp baru
     renderOrders(); 
     syncToServer(orders[idx]); 
   }
@@ -828,6 +829,7 @@
     orders[editIdx].fittingDate=document.getElementById('modal-fittingdate').value;
     orders[editIdx].remarks=document.getElementById('modal-remarks').value.trim();
     orders[editIdx].items=getModalItems();
+    orders[editIdx].lastUpdated=new Date().toISOString(); // FIX Bug 2a: force lastUpdated baru agar tidak di-skip backend
     var _ei=editIdx; closeEditModal(); renderOrders(); syncToServer(orders[_ei]);
   }
   function renderModalItems(items) {
@@ -982,9 +984,9 @@
     if(currentArchiveSort==='newest')    filtered.sort(function(a,b){ return (b.order.orderNum||'').localeCompare(a.order.orderNum||'',undefined,{numeric:true}); });
     else if(currentArchiveSort==='oldest') filtered.sort(function(a,b){ return (a.order.orderNum||'').localeCompare(b.order.orderNum||'',undefined,{numeric:true}); });
     else if(currentArchiveSort==='due-asc')  filtered.sort(function(a,b){ return (a.order.dueDate||'9999').localeCompare(b.order.dueDate||'9999'); });
-    else if(currentArchiveSort==='due-desc') filtered.sort(function(a,b){ return (b.order.dueDate||'9999').localeCompare(b.order.dueDate||'9999'); });
+    else if(currentArchiveSort==='due-desc') filtered.sort(function(a,b){ return (b.order.dueDate||'9999').localeCompare(a.order.dueDate||'9999'); }); // FIX Bug 3: b vs a
     else if(currentArchiveSort==='fit-asc')  filtered.sort(function(a,b){ return (a.order.fittingDate||'9999').localeCompare(b.order.fittingDate||'9999'); });
-    else if(currentArchiveSort==='fit-desc') filtered.sort(function(a,b){ return (b.order.fittingDate||'9999').localeCompare(b.order.fittingDate||'9999'); });
+    else if(currentArchiveSort==='fit-desc') filtered.sort(function(a,b){ return (b.order.fittingDate||'9999').localeCompare(a.order.fittingDate||'9999'); }); // FIX Bug 3: b vs a
 
     if(filtered.length===0){ el.innerHTML='<div class="right-empty"><span class="right-empty-icon">🔍</span>'+(searchTerm?'No archived orders match "'+esc(searchTerm)+'"':'No archived orders.')+'</div>'; updateBadges(); return; }
 

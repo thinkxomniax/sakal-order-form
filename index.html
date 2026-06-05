@@ -316,6 +316,18 @@
           <button class="sort-btn" onclick="clearArchiveDateFilter()">✕ Clear</button>
         </div>
       </div>
+      <div class="filter-bar" id="archive-date-filter-bar" style="margin-bottom:0.75rem;display:none;">
+        <span class="filter-label">Ordered</span>
+        <input type="date" id="arc-filter-ordered-from" class="sort-btn" style="padding:0 8px;font-family:'Helvetica Neue',sans-serif;font-size:12px;" oninput="applyArchiveDateFilter()">
+        <span style="font-size:11px;color:var(--text-faint)">→</span>
+        <input type="date" id="arc-filter-ordered-to" class="sort-btn" style="padding:0 8px;font-family:'Helvetica Neue',sans-serif;font-size:12px;" oninput="applyArchiveDateFilter()">
+        <div class="filter-divider"></div>
+        <span class="filter-label">Due Date</span>
+        <input type="date" id="arc-filter-due-from" class="sort-btn" style="padding:0 8px;font-family:'Helvetica Neue',sans-serif;font-size:12px;" oninput="applyArchiveDateFilter()">
+        <span style="font-size:11px;color:var(--text-faint)">→</span>
+        <input type="date" id="arc-filter-due-to" class="sort-btn" style="padding:0 8px;font-family:'Helvetica Neue',sans-serif;font-size:12px;" oninput="applyArchiveDateFilter()">
+        <button class="sort-btn" id="arc-filter-date-clear" onclick="clearArchiveDateFilter()">✕ Clear</button>
+      </div>
       <div id="archive-content"></div>
     </div>
   </div>
@@ -387,7 +399,7 @@
 
 <script>
   // ── API ──
-  const API_URL = 'https://script.google.com/macros/s/AKfycbxEb1kmKXqkyWsMLINjLUI-2XVd52V-qabbqHcy1IJERQa5lmwIjohJtCmsEv-rU4-D/exec';
+  const API_URL = 'https://script.google.com/macros/s/AKfycbxoX9ZNDXz0_PRr1keD_njjBo5A_ygJNQNwkZ8BmaRxiQg-H-we-PLBfDOPrhC7YhzX/exec';
 
   // ── CONSTANTS ──
   var PRODUCTS     = ['Jacket','Trousers','Shirt','Vest','Safari Jacket','Overcoat'];
@@ -410,15 +422,21 @@
   var arcTlPendingIdx = -1, arcTlPendingNext = 0, arcTlEditingExisting = false;
 
   // ── DATE HELPERS ──
+  // parseToYMD: converts ANY date format → 'yyyy-MM-dd' string
   function parseToYMD(val) {
     if (!val) return '';
     var s = String(val).trim();
-    if (/^\d{4}-\d{2}-\d{2}$/.test(s)) return s;                   
-    if (/^\d{4}-\d{2}-\d{2}T/.test(s)) return s.substring(0, 10);  
+    if (/^\d{4}-\d{2}-\d{2}$/.test(s)) return s;                   // already yyyy-MM-dd
+    if (/^\d{4}-\d{2}-\d{2}T/.test(s)) return s.substring(0, 10);  // ISO with time
 
+    // dd/MM/yyyy (e.g. "09/05/2026" dari Google Sheets ID locale)
     var m1 = s.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
     if (m1) return m1[3] + '-' + m1[2].padStart(2,'0') + '-' + m1[1].padStart(2,'0');
 
+    // MM/dd/yyyy (e.g. "05/09/2026" dari locale US)
+    // (dibedakan berdasarkan posisi; jika bulan > 12, swap)
+    // Note: ambiguous, tapi Google Sheets biasanya kirim dd/MM kalau locale ID
+    // Format "Month dd, yyyy" (e.g. "May 9, 2026")
     var months = {jan:1,feb:2,mar:3,apr:4,may:5,jun:6,jul:7,aug:8,sep:9,oct:10,nov:11,dec:12};
     var m2 = s.match(/^([A-Za-z]+)\s+(\d{1,2}),?\s+(\d{4})$/);
     if (m2) {
@@ -426,12 +444,15 @@
       if (mo) return m2[3] + '-' + String(mo).padStart(2,'0') + '-' + m2[2].padStart(2,'0');
     }
 
+    // dd Month yyyy (e.g. "9 May 2026")
     var m3 = s.match(/^(\d{1,2})\s+([A-Za-z]+)\s+(\d{4})$/);
     if (m3) {
       var mo2 = months[m3[2].toLowerCase().substring(0,3)];
       if (mo2) return m3[3] + '-' + String(mo2).padStart(2,'0') + '-' + m3[1].padStart(2,'0');
     }
 
+    // "Mon Apr 27 2026 00:00:00 GM..." — format dari Google Sheets yang terpotong
+    // Ambil bagian "Mon Apr 27 2026" saja lalu parse manual
     var m4 = s.match(/^[A-Za-z]{3}\s+([A-Za-z]{3})\s+(\d{1,2})\s+(\d{4})/);
     if (m4) {
       var months2 = {jan:1,feb:2,mar:3,apr:4,may:5,jun:6,jul:7,aug:8,sep:9,oct:10,nov:11,dec:12};
@@ -439,14 +460,17 @@
       if (mo3) return m4[3] + '-' + String(mo3).padStart(2,'0') + '-' + m4[2].padStart(2,'0');
     }
 
+    // Fallback: new Date() — tapi gunakan UTC-safe parsing untuk hindari timezone shift
     var d = new Date(s);
     if (!isNaN(d.getTime())) {
+      // Gunakan UTC values untuk hindari off-by-one karena UTC vs local
       var utcY = d.getUTCFullYear(), utcM = d.getUTCMonth()+1, utcD = d.getUTCDate();
       return utcY + '-' + String(utcM).padStart(2,'0') + '-' + String(utcD).padStart(2,'0');
     }
     return '';
   }
 
+  // formatDisplayDate: converts any date value → "9 May 2026"
   function formatDisplayDate(val) {
     if (!val) return '—';
     var ymd = parseToYMD(val);
@@ -463,6 +487,7 @@
     var diff = (d-n)/86400000; return diff >= 0 && diff <= 3;
   }
 
+  // Normalize order dates on load
   function normalizeOrder(o) {
     o.orderNum    = String(o.orderNum || '').trim();
     o.date        = parseToYMD(o.date);
@@ -478,7 +503,7 @@
 
   // ── API SYNC ──
   var lastSyncTime = 0;
-  var syncTimers = {}; 
+  var syncTimers = {}; // debounce timer per order
 
   function syncToServer(orderData, isDelete) {
     if (!orderData || !orderData.orderNum) { console.warn("syncToServer: invalid orderData", orderData); return; }
@@ -486,17 +511,22 @@
     saveToLocalStorage();
     lastSyncTime = Date.now();
 
+    // DELETE → langsung kirim, tidak perlu debounce
     if (isDelete) {
       showToast('Deleting...');
       _doSync({action:'DELETE', orderNum: orderData.orderNum}, true);
       return;
     }
 
+    // SAVE/UPDATE → debounce 1.5 detik per order
+    // Kalau ada toggle lagi sebelum 1.5 detik, timer di-reset
     var key = orderData.orderNum;
     showToast('Saving...');
     if (syncTimers[key]) clearTimeout(syncTimers[key]);
     syncTimers[key] = setTimeout(function() {
       delete syncTimers[key];
+      // Ambil data terbaru dari orders array (bukan dari closure)
+      // supaya semua toggle yang cepet tadi ikut ke-capture
       var latest = orders.find(function(o){ return o.orderNum === key; })
                 || archivedOrders.find(function(o){ return o.orderNum === key; });
       if (!latest) return;
@@ -557,6 +587,7 @@
     catch(e) { console.log('Cannot save to localStorage'); }
   }
 
+  // ── INIT ──
   window.onload = function() {
     fetchOrdersFromServer();
     setTimeout(function() {
@@ -565,13 +596,15 @@
     }, 3000);
   };
 
+  // Auto-refresh on focus — skip if user is actively searching OR recently saved (within 30s)
   window.addEventListener('focus', function() {
     var oS = document.getElementById('order-search'), aS = document.getElementById('archive-search');
     if ((oS && oS.value.trim()) || (aS && aS.value.trim())) return;
-    if (Date.now() - lastSyncTime < 30000) return; 
+    if (Date.now() - lastSyncTime < 30000) return; // skip if saved within last 30 seconds
     fetchOrdersFromServer();
   });
 
+  // ── TABS ──
   function switchTab(tab) {
     currentTab = tab;
     document.getElementById('pane-orders').style.display  = tab === 'orders'  ? '' : 'none';
@@ -592,6 +625,7 @@
     document.getElementById('badge-archive').textContent = archivedOrders.length;
   }
 
+  // ── FORM ──
   function getStatusStates(p) {
     if (NO_DELTA_PRODUCTS.indexOf(p) !== -1) return STATUS_STATES_NO_DELTA;
     if (NO_BATAM_PRODUCTS.indexOf(p) !== -1) return STATUS_STATES_NO_BATAM;
@@ -635,8 +669,6 @@
       var l=document.getElementById('lining-input-'+i); if(l&&needsLining(item.product)) l.style.borderColor=l.value?'':'#e0913a';
     });
   }
-
-  // FIXED: Fitur Tanggal Otomatis & Status Default Berjalan Sempurna
   function submitOrder() {
     var orderNum=document.getElementById('ordernum-input').value.trim();
     var dueDate=document.getElementById('duedate-input').value;
@@ -649,24 +681,18 @@
       showToast('Please fill in all required fabric/lining fields'); onFabricInput(); return;
     }
     var remarks=document.getElementById('remarks-input').value.trim();
-    
-    var today = new Date();
-    var dateStr = today.getFullYear() + '-' + String(today.getMonth() + 1).padStart(2, '0') + '-' + String(today.getDate()).padStart(2, '0');
-    
-    var newItems=selectedItems.map(function(item){ return {product:item.product,fabric:item.fabric,lining:item.lining,status:'Fabric Ordered',paid:false,invoice:false,stuck:false}; });
-    var newOrder={orderNum:orderNum,dueDate:dueDate,fittingDate:fittingDate,items:newItems,date:dateStr,fitted:0,remarks:remarks,archived:false,lastUpdated:new Date().toISOString()};
-    
+    var today=new Date();
+    var dateStr=today.getFullYear()+'-'+String(today.getMonth()+1).padStart(2,'0')+'-'+String(today.getDate()).padStart(2,'0');
+    var newItems=selectedItems.map(function(item){ return {product:item.product,fabric:item.fabric,lining:item.lining,status:'',paid:false,invoice:false,stuck:false}; });
+    var newOrder={orderNum:orderNum,dueDate:dueDate,fittingDate:fittingDate,items:newItems,date:dateStr,fitted:0,remarks:remarks,archived:false};
     orders.unshift(newOrder);
     showToast('Order '+orderNum+' submitted');
     ['ordernum-input','remarks-input','fittingdate-input','duedate-input'].forEach(function(id){ document.getElementById(id).value=''; });
-    
-    document.getElementById('duedate-none-btn').classList.add('none-btn-active');
-    document.getElementById('fittingdate-none-btn').classList.add('none-btn-active');
-    
     selectedItems=[]; renderFabricFields(); updateProductButtons(); renderOrders();
     syncToServer(newOrder);
   }
 
+  // ── DELETE & ARCHIVE ──
   function deleteOrder(idx) { delPendingType='order'; delPendingOi=idx; document.getElementById('del-modal-msg').textContent='Delete order '+orders[idx].orderNum+'? This cannot be undone.'; document.getElementById('del-modal').classList.add('open'); }
   function deleteArchiveOrder(ai) { delPendingType='archive'; delPendingOi=ai; document.getElementById('del-modal-msg').textContent='Permanently delete archived order '+archivedOrders[ai].orderNum+'?'; document.getElementById('del-modal').classList.add('open'); }
   function deleteItem(oi,ii) {
@@ -723,6 +749,7 @@
   function restoreOrder(ai) { confirmRestore(ai); }
   function closeConfirmModal() { document.getElementById('confirm-modal').classList.remove('open'); archivePendingIdx=-1; restorePendingIdx=-1; }
 
+  // ── STATUS & MODALS ──
   function toggleItemStatus(oi,ii,field) {
     var item=orders[oi].items[ii];
     if (field==='status') { var states=getStatusStates(item.product),cur=states.indexOf(item.status); item.status=states[cur===-1?0:(cur+1)%states.length]; }
@@ -745,6 +772,7 @@
     var dateVal=document.getElementById('tl-date-input').value;
     if (!dateVal) { showToast('Please enter a date'); return; }
 
+    // Archive mode
     if(arcTlPendingIdx>=0) {
       var ao=archivedOrders[arcTlPendingIdx];
       if(!ao.fittedDates) ao.fittedDates={};
@@ -754,6 +782,7 @@
       return;
     }
 
+    // Orders mode
     if (tlPendingOi<0) return;
     if (!tlEditingExisting) orders[tlPendingOi].fitted=tlPendingNext;
     if (!orders[tlPendingOi].fittedDates) orders[tlPendingOi].fittedDates={};
@@ -765,6 +794,7 @@
     for (var l=level;l<=3;l++) delete orders[oi].fittedDates[l];
     orders[oi].fitted=level-1; renderOrders(); syncToServer(orders[oi]);
   }
+  // ── ARCHIVE FITTED DOT FUNCTIONS ──
   function toggleArchiveFitted(ai) {
     if(!archivedOrders[ai]) return;
     var o=archivedOrders[ai];
@@ -796,16 +826,7 @@
     document.getElementById('tl-date-input').value=(orders[oi].fittedDates||{})[level]||'';
     document.getElementById('tl-modal').classList.add('open');
   }
-
-  // FIXED Bug 2b: Inline Date Editor - tambah lastUpdated agar tidak di-skip backend
-  function saveInlineDate(idx,type,picker) { 
-    if(!orders[idx]) return;
-    if(type==='due') orders[idx].dueDate=picker.value; 
-    else orders[idx].fittingDate=picker.value; 
-    orders[idx].lastUpdated=new Date().toISOString(); // FIX: force timestamp baru
-    renderOrders(); 
-    syncToServer(orders[idx]); 
-  }
+  function saveInlineDate(idx,type,picker) { if(type==='due') orders[idx].dueDate=picker.value; else orders[idx].fittingDate=picker.value; renderOrders(); syncToServer(orders[idx]); }
   function cancelInlineDate()  { setTimeout(function(){ renderOrders(); },150); }
   function cancelFittingDate() { setTimeout(function(){ renderOrders(); },150); }
   function openInlineDatePicker(idx,cell)  { cell.querySelector('.due-date-display').style.display='none'; var p=cell.querySelector('.due-date-picker'); p.style.display='inline-block'; p.focus(); try{p.showPicker();}catch(e){} }
@@ -829,7 +850,6 @@
     orders[editIdx].fittingDate=document.getElementById('modal-fittingdate').value;
     orders[editIdx].remarks=document.getElementById('modal-remarks').value.trim();
     orders[editIdx].items=getModalItems();
-    orders[editIdx].lastUpdated=new Date().toISOString(); // FIX Bug 2a: force lastUpdated baru agar tidak di-skip backend
     var _ei=editIdx; closeEditModal(); renderOrders(); syncToServer(orders[_ei]);
   }
   function renderModalItems(items) {
@@ -857,6 +877,7 @@
     return items;
   }
 
+  // ── RENDER HELPERS ──
   function statusClass(s) { var m={'Batam':'on-batam','Delta':'on-delta','Fabric Ordered':'on-fabricordered','In-store':'on-instore','Take Home':'on-takehome','Bin':'on-bin'}; return m[s]||''; }
   function showToast(msg) { var t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show'); setTimeout(function(){ t.classList.remove('show'); },2600); }
   function esc(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
@@ -878,7 +899,7 @@
     return html+'</div>';
   }
 
-  // FIXED: Logic Sorting 'Newest First' Membaca Angka Order dengan Akurat Berdasarkan Urutan Terbesar
+  // ── RENDER ORDERS ──
   function renderOrders() {
     var el=document.getElementById('orders-content');
     var searchEl=document.getElementById('order-search');
@@ -923,8 +944,8 @@
       html+='<div class="order-card" id="order-card-'+oi+'"><div class="order-summary"><span class="order-summary-num">'+esc(o.orderNum)+'</span>'
         +'<div class="order-summary-dates">'
         +'<div class="hdr-date-group"><span class="hdr-date-label">Ordered</span><span class="hdr-date-val">'+esc(dOrd)+'</span></div>'
-        +'<div class="hdr-date-group due-date-cell" onclick="openInlineDatePicker('+oi+',this)"><span class="hdr-date-label">Due Date</span><span class="due-date-display hdr-date-val'+(dueSoon?' due-soon':'')+'">'+esc(dDue)+'</span><input type="date" class="due-date-picker" value="'+(o.dueDate||'')+'" min="'+tom+'" onchange="saveInlineDate('+oi+',\'due\',this)" onblur="cancelInlineDate()" onclick="event.stopPropagation()"></div>'
         +'<div class="hdr-date-group fitting-date-cell" onclick="openFittingDatePicker('+oi+',this)"><span class="hdr-date-label">Fitting Date</span><span class="fitting-date-display hdr-date-val">'+esc(dFit)+'</span><input type="date" class="fitting-date-picker" value="'+(o.fittingDate||'')+'" min="'+tom+'" onchange="saveInlineDate('+oi+',\'fitting\',this)" onblur="cancelFittingDate()" onclick="event.stopPropagation()"></div>'
+        +'<div class="hdr-date-group due-date-cell" onclick="openInlineDatePicker('+oi+',this)"><span class="hdr-date-label">Due Date</span><span class="due-date-display hdr-date-val'+(dueSoon?' due-soon':'')+'">'+esc(dDue)+'</span><input type="date" class="due-date-picker" value="'+(o.dueDate||'')+'" min="'+tom+'" onchange="saveInlineDate('+oi+',\'due\',this)" onblur="cancelInlineDate()" onclick="event.stopPropagation()"></div>'
         +'</div><div class="order-summary-right" onclick="event.stopPropagation()">'+fittedDotsHtml(oi)
         +'<button class="archive-btn" onclick="archiveOrder('+oi+')">📦 Archive</button>'
         +'<div class="edit-btn" onclick="openEditModal('+oi+')">✎</div><div class="delete-btn" onclick="deleteOrder('+oi+')">✕</div>'
@@ -948,7 +969,7 @@
     var o=archivedOrders[ai];
     if(!o) return '';
     var fitted=o.fitted||0, fittedDates=o.fittedDates||{};
-    var colors=['red','amber','green'];
+    var colors=['red','amber','green'], labels=['Baste Fitting','Fitting','Final / Take Home'];
     var html='<div style="display:flex;gap:8px;align-items:flex-start">';
     for (var k=0;k<3;k++) {
       var level=k+1, isLit=k<fitted, isNext=level===fitted+1;
@@ -963,6 +984,7 @@
     return html+'</div>';
   }
 
+  // ── RENDER ARCHIVE ──
   function renderArchive() {
     var el=document.getElementById('archive-content');
     var searchEl=document.getElementById('archive-search');
@@ -984,9 +1006,9 @@
     if(currentArchiveSort==='newest')    filtered.sort(function(a,b){ return (b.order.orderNum||'').localeCompare(a.order.orderNum||'',undefined,{numeric:true}); });
     else if(currentArchiveSort==='oldest') filtered.sort(function(a,b){ return (a.order.orderNum||'').localeCompare(b.order.orderNum||'',undefined,{numeric:true}); });
     else if(currentArchiveSort==='due-asc')  filtered.sort(function(a,b){ return (a.order.dueDate||'9999').localeCompare(b.order.dueDate||'9999'); });
-    else if(currentArchiveSort==='due-desc') filtered.sort(function(a,b){ return (b.order.dueDate||'9999').localeCompare(a.order.dueDate||'9999'); }); // FIX Bug 3: b vs a
+    else if(currentArchiveSort==='due-desc') filtered.sort(function(a,b){ return (b.order.dueDate||'9999').localeCompare(a.order.dueDate||'9999'); });
     else if(currentArchiveSort==='fit-asc')  filtered.sort(function(a,b){ return (a.order.fittingDate||'9999').localeCompare(b.order.fittingDate||'9999'); });
-    else if(currentArchiveSort==='fit-desc') filtered.sort(function(a,b){ return (b.order.fittingDate||'9999').localeCompare(a.order.fittingDate||'9999'); }); // FIX Bug 3: b vs a
+    else if(currentArchiveSort==='fit-desc') filtered.sort(function(a,b){ return (b.order.fittingDate||'9999').localeCompare(a.order.fittingDate||'9999'); });
 
     if(filtered.length===0){ el.innerHTML='<div class="right-empty"><span class="right-empty-icon">🔍</span>'+(searchTerm?'No archived orders match "'+esc(searchTerm)+'"':'No archived orders.')+'</div>'; updateBadges(); return; }
 
@@ -997,8 +1019,8 @@
       html+='<div class="order-card" id="arc-card-'+ai+'"><div class="order-summary"><span class="order-summary-num">'+esc(o.orderNum)+'</span>'
         +'<div class="order-summary-dates">'
         +'<div class="hdr-date-group"><span class="hdr-date-label">Ordered</span><span class="hdr-date-val">'+esc(dOrd)+'</span></div>'
-        +'<div class="hdr-date-group"><span class="hdr-date-label">Due Date</span><span class="hdr-date-val">'+esc(dDue)+'</span></div>'
         +'<div class="hdr-date-group"><span class="hdr-date-label">Fitting Date</span><span class="hdr-date-val">'+esc(dFit)+'</span></div>'
+        +'<div class="hdr-date-group"><span class="hdr-date-label">Due Date</span><span class="hdr-date-val">'+esc(dDue)+'</span></div>'
         +'</div><div class="order-summary-right" onclick="event.stopPropagation()">'+fittedDotsHtmlArchive(ai)
         +'<button class="restore-btn" onclick="confirmRestore('+ai+')">↩ Restore</button>'
         +'<div class="delete-btn" onclick="deleteArchiveOrder('+ai+')">✕</div>'
@@ -1017,6 +1039,7 @@
     el.innerHTML=html; updateBadges();
   }
 
+  // ── SORT & FILTER ──
   function setSort(mode)        { currentSort=mode; updateSortButtons(); renderOrders(); }
   function setArchiveSort(mode) { currentArchiveSort=mode; updateArchiveSortButtons(); renderArchive(); }
   function toggleSort()           { setSort(currentSort==='newest'?'oldest':'newest'); }
@@ -1087,6 +1110,7 @@
   function clearSearch() { document.getElementById('order-search').value=''; document.getElementById('search-clear').style.display='none'; renderOrders(); }
   function clearArchiveSearch() { document.getElementById('archive-search').value=''; document.getElementById('archive-search-clear').style.display='none'; renderArchive(); }
 
+  // ── MISC ──
   function toggleNoneDate(f) {
     var i=document.getElementById(f+'-input'), b=document.getElementById(f+'-none-btn');
     if(i.value){ i.value=''; b.classList.add('none-btn-active'); } else { b.classList.toggle('none-btn-active'); }

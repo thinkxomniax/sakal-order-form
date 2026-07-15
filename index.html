@@ -185,6 +185,10 @@
       <div class="section-label">Order No.</div>
       <input class="ref-input" type="text" id="ordernum-input" placeholder="e.g. 2025-001" autocomplete="off">
       <div class="error-msg" id="ordernum-error">Please enter an Order No. before submitting.</div>
+      <div class="section-label">Customer Name</div>
+      <input class="ref-input" type="text" id="customername-input" placeholder="e.g. John Tan" autocomplete="off">
+      <div class="section-label">Contact</div>
+      <input class="ref-input" type="text" id="customercontact-input" placeholder="e.g. +62 812-3456-7890" autocomplete="off">
       <div class="section-label">Due Date</div>
       <div style="display:flex;gap:8px;align-items:center">
         <input class="ref-input" type="date" id="duedate-input" style="flex:1">
@@ -223,7 +227,7 @@
 
     <div id="pane-orders">
       <div class="search-wrap">
-        <input class="search-input" type="text" id="order-search" placeholder="Search by order no., fabric, lining or remarks…" oninput="renderOrders()" onkeypress="if(event.key==='Enter')renderOrders();" autocomplete="off">
+        <input class="search-input" type="text" id="order-search" placeholder="Search by order no., name, contact, fabric, lining or remarks…" oninput="renderOrders()" onkeypress="if(event.key==='Enter')renderOrders();" autocomplete="off">
         <button class="search-clear-btn" id="search-clear" onclick="clearSearch()" style="display:none;">✕</button>
       </div>
       <div class="filter-bar">
@@ -290,7 +294,7 @@
 
     <div id="pane-archive" style="display:none;">
       <div class="search-wrap">
-        <input class="search-input" type="text" id="archive-search" placeholder="Search archive by order no., fabric, lining or remarks…" oninput="renderArchive()" onkeypress="if(event.key==='Enter')renderArchive();" autocomplete="off">
+        <input class="search-input" type="text" id="archive-search" placeholder="Search archive by order no., name, contact, fabric, lining or remarks…" oninput="renderArchive()" onkeypress="if(event.key==='Enter')renderArchive();" autocomplete="off">
         <button class="search-clear-btn" id="archive-search-clear" onclick="clearArchiveSearch()" style="display:none;">✕</button>
       </div>
       <div class="filter-bar">
@@ -376,6 +380,10 @@
     <div class="modal-title">Edit Order</div>
     <label class="modal-label">Order No.</label>
     <input class="modal-input" type="text" id="modal-ordernum" placeholder="e.g. 2025-001">
+    <label class="modal-label">Customer Name</label>
+    <input class="modal-input" type="text" id="modal-customername" placeholder="e.g. John Tan">
+    <label class="modal-label">Contact</label>
+    <input class="modal-input" type="text" id="modal-customercontact" placeholder="e.g. +62 812-3456-7890">
     <label class="modal-label">Due Date</label>
     <div style="display:flex;gap:8px;align-items:center;margin-bottom:12px">
       <input class="modal-input" type="date" id="modal-duedate" style="flex:1;margin-bottom:0">
@@ -490,6 +498,8 @@
   // Normalize order dates on load
   function normalizeOrder(o) {
     o.orderNum    = String(o.orderNum || '').trim();
+    o.customerName    = typeof o.customerName === 'string' ? o.customerName : '';
+    o.customerContact = typeof o.customerContact === 'string' ? o.customerContact : '';
     o.date        = parseToYMD(o.date);
     o.dueDate     = parseToYMD(o.dueDate);
     o.fittingDate = parseToYMD(o.fittingDate);
@@ -671,6 +681,8 @@
   }
   function submitOrder() {
     var orderNum=document.getElementById('ordernum-input').value.trim();
+    var customerName=document.getElementById('customername-input').value.trim();
+    var customerContact=document.getElementById('customercontact-input').value.trim();
     var dueDate=document.getElementById('duedate-input').value;
     var fittingDate=document.getElementById('fittingdate-input').value;
     var errNum=document.getElementById('ordernum-error'); errNum.style.display='none';
@@ -684,10 +696,10 @@
     var today=new Date();
     var dateStr=today.getFullYear()+'-'+String(today.getMonth()+1).padStart(2,'0')+'-'+String(today.getDate()).padStart(2,'0');
     var newItems=selectedItems.map(function(item){ return {product:item.product,fabric:item.fabric,lining:item.lining,status:'',paid:false,invoice:false,stuck:false}; });
-    var newOrder={orderNum:orderNum,dueDate:dueDate,fittingDate:fittingDate,items:newItems,date:dateStr,fitted:0,remarks:remarks,archived:false};
+    var newOrder={orderNum:orderNum,customerName:customerName,customerContact:customerContact,dueDate:dueDate,fittingDate:fittingDate,items:newItems,date:dateStr,fitted:0,remarks:remarks,archived:false};
     orders.unshift(newOrder);
     showToast('Order '+orderNum+' submitted');
-    ['ordernum-input','remarks-input','fittingdate-input','duedate-input'].forEach(function(id){ document.getElementById(id).value=''; });
+    ['ordernum-input','customername-input','customercontact-input','remarks-input','fittingdate-input','duedate-input'].forEach(function(id){ document.getElementById(id).value=''; });
     selectedItems=[]; renderFabricFields(); updateProductButtons(); renderOrders();
     syncToServer(newOrder);
   }
@@ -835,6 +847,8 @@
   function openEditModal(idx) {
     editIdx=idx; var o=orders[idx];
     document.getElementById('modal-ordernum').value=o.orderNum;
+    document.getElementById('modal-customername').value=o.customerName||'';
+    document.getElementById('modal-customercontact').value=o.customerContact||'';
     document.getElementById('modal-duedate').value=o.dueDate||'';
     document.getElementById('modal-fittingdate').value=o.fittingDate||'';
     document.getElementById('modal-remarks').value=o.remarks||'';
@@ -846,6 +860,8 @@
     if (editIdx<0) return;
     var newNum=document.getElementById('modal-ordernum').value.trim(); if(!newNum) return;
     orders[editIdx].orderNum=newNum;
+    orders[editIdx].customerName=document.getElementById('modal-customername').value.trim();
+    orders[editIdx].customerContact=document.getElementById('modal-customercontact').value.trim();
     orders[editIdx].dueDate=document.getElementById('modal-duedate').value;
     orders[editIdx].fittingDate=document.getElementById('modal-fittingdate').value;
     orders[editIdx].remarks=document.getElementById('modal-remarks').value.trim();
@@ -881,6 +897,13 @@
   function statusClass(s) { var m={'Batam':'on-batam','Delta':'on-delta','Fabric Ordered':'on-fabricordered','In-store':'on-instore','Take Home':'on-takehome','Bin':'on-bin'}; return m[s]||''; }
   function showToast(msg) { var t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show'); setTimeout(function(){ t.classList.remove('show'); },2600); }
   function esc(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+  function customerInfoHtml(o) {
+    var name = o.customerName || '', contact = o.customerContact || '';
+    if (!name && !contact) return '';
+    var val = name && contact ? esc(name)+' · '+esc(contact) : esc(name || contact);
+    return '<div class="hdr-date-group" style="cursor:default"><span class="hdr-date-label">Customer</span><span class="hdr-date-val">'+val+'</span></div>';
+  }
 
   function fittedDotsHtml(oi) {
     var fitted=orders[oi].fitted||0, fittedDates=orders[oi].fittedDates||{};
@@ -919,6 +942,8 @@
       if(filterDueTo   && (o.dueDate||'') > filterDueTo)   return false;
       if(searchTerm) {
         if(String(o.orderNum||'').toLowerCase().indexOf(searchTerm)!==-1) return true;
+        if(String(o.customerName||'').toLowerCase().indexOf(searchTerm)!==-1) return true;
+        if(String(o.customerContact||'').toLowerCase().indexOf(searchTerm)!==-1) return true;
         if(String(o.remarks||'').toLowerCase().indexOf(searchTerm)!==-1) return true;
         if(items.some(function(it){ return (it.fabric||'').toLowerCase().indexOf(searchTerm)!==-1||(it.lining||'').toLowerCase().indexOf(searchTerm)!==-1; })) return true;
         return false;
@@ -943,6 +968,7 @@
       var dDue=formatDisplayDate(o.dueDate), dFit=formatDisplayDate(o.fittingDate), dOrd=formatDisplayDate(o.date);
       html+='<div class="order-card" id="order-card-'+oi+'"><div class="order-summary"><span class="order-summary-num">'+esc(o.orderNum)+'</span>'
         +'<div class="order-summary-dates">'
+        +customerInfoHtml(o)
         +'<div class="hdr-date-group"><span class="hdr-date-label">Ordered</span><span class="hdr-date-val">'+esc(dOrd)+'</span></div>'
         +'<div class="hdr-date-group fitting-date-cell" onclick="openFittingDatePicker('+oi+',this)"><span class="hdr-date-label">Fitting Date</span><span class="fitting-date-display hdr-date-val">'+esc(dFit)+'</span><input type="date" class="fitting-date-picker" value="'+(o.fittingDate||'')+'" min="'+tom+'" onchange="saveInlineDate('+oi+',\'fitting\',this)" onblur="cancelFittingDate()" onclick="event.stopPropagation()"></div>'
         +'<div class="hdr-date-group due-date-cell" onclick="openInlineDatePicker('+oi+',this)"><span class="hdr-date-label">Due Date</span><span class="due-date-display hdr-date-val'+(dueSoon?' due-soon':'')+'">'+esc(dDue)+'</span><input type="date" class="due-date-picker" value="'+(o.dueDate||'')+'" min="'+tom+'" onchange="saveInlineDate('+oi+',\'due\',this)" onblur="cancelInlineDate()" onclick="event.stopPropagation()"></div>'
@@ -999,6 +1025,8 @@
       if(arcFilterDueTo   && (o.dueDate||'') > arcFilterDueTo)   return false;
       if(!searchTerm) return true;
       if(String(o.orderNum||'').toLowerCase().indexOf(searchTerm)!==-1) return true;
+      if(String(o.customerName||'').toLowerCase().indexOf(searchTerm)!==-1) return true;
+      if(String(o.customerContact||'').toLowerCase().indexOf(searchTerm)!==-1) return true;
       if(String(o.remarks||'').toLowerCase().indexOf(searchTerm)!==-1) return true;
       return (o.items||[]).some(function(it){ return (it.fabric||'').toLowerCase().indexOf(searchTerm)!==-1||(it.lining||'').toLowerCase().indexOf(searchTerm)!==-1; });
     });
@@ -1018,6 +1046,7 @@
       var dDue=formatDisplayDate(o.dueDate), dFit=formatDisplayDate(o.fittingDate), dOrd=formatDisplayDate(o.date);
       html+='<div class="order-card" id="arc-card-'+ai+'"><div class="order-summary"><span class="order-summary-num">'+esc(o.orderNum)+'</span>'
         +'<div class="order-summary-dates">'
+        +customerInfoHtml(o)
         +'<div class="hdr-date-group"><span class="hdr-date-label">Ordered</span><span class="hdr-date-val">'+esc(dOrd)+'</span></div>'
         +'<div class="hdr-date-group"><span class="hdr-date-label">Fitting Date</span><span class="hdr-date-val">'+esc(dFit)+'</span></div>'
         +'<div class="hdr-date-group"><span class="hdr-date-label">Due Date</span><span class="hdr-date-val">'+esc(dDue)+'</span></div>'

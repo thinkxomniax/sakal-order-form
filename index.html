@@ -407,7 +407,7 @@
 
 <script>
   // ── API ──
-  const API_URL = 'https://script.google.com/macros/s/AKfycbyVyGDgP8KNBz4ImHSXUMm4u6Hv2UDe_XLqhv9JlzKhn7F358xoRM2enrXutP-xJQmB/exec';
+  const API_URL = 'https://script.google.com/macros/s/AKfycby24E2myeb2iqU-rnAowVXR5eEjvrXiYEiJm38P3vf4l53G6HTbg2k-rpj0juhoIPWv/exec';
   // ── CONSTANTS ──
   var PRODUCTS     = ['Jacket','Trousers','Shirt','Vest','Safari Jacket','Overcoat'];
   var PRODUCT_IDS  = {'Jacket':'jacket','Trousers':'trousers','Shirt':'shirt','Vest':'vest','Safari Jacket':'safari','Overcoat':'overcoat'};
@@ -545,52 +545,37 @@
 
   async function _doSync(payload, isDelete) {
     try {
-      await fetch(API_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(payload), headers: { 'Content-Type': 'text/plain;charset=utf-8' }, redirect: 'follow' });
-      showToast(isDelete ? '✓ Deleted' : '✓ Saved');
-    } catch (err) {
-      console.error('Sync error:', err);
-      showToast('✓ Saved locally');
-    }
+      var r = await fetch(API_URL, {method:'POST', body:JSON.stringify(payload), headers:{'Content-Type':'text/plain;charset=utf-8'}, redirect:'follow'});
+      var text = await r.text();
+      var result = {};
+      try { result = JSON.parse(text); } catch(_) { result = {status: text.includes('success') ? 'success' : 'error'}; }
+      showToast(result.status==='success' ? (isDelete?'✓ Deleted':'✓ Saved') : '⚠️ Local save only (API error)');
+    } catch(err) { console.error('Sync error:',err); showToast('✓ Saved locally (offline)'); }
   }
 
   async function fetchOrdersFromServer() {
     var btn = document.getElementById('save-fab');
     if (btn) btn.textContent = '⏳ Syncing...';
-    var cbName = 'jsonp_cb_' + Date.now();
-    var script;
-    function cleanup() { try { delete window[cbName]; } catch(e) { window[cbName] = undefined; } if (script && script.parentNode) script.parentNode.removeChild(script); }
-    var timeoutId = setTimeout(function() {
-      showToast('⚠️ Sync timed out — using cached data');
+    try {
+      var r = await fetch(API_URL, {redirect: 'follow'});
+      var _t = await r.text(); var result = {}; try { result = JSON.parse(_t); } catch(_){ result = {status:_t.includes("success")?"success":"error"}; }
+      if (result.status === 'success') {
+        orders = []; archivedOrders = [];
+        (result.data || []).forEach(function(o) {
+          normalizeOrder(o);
+          if (o.archived) archivedOrders.push(o); else orders.push(o);
+        });
+        renderOrders(); renderArchive();
+        if (btn) btn.textContent = '🔄 Refresh';
+        showToast('✓ Data loaded');
+        saveToLocalStorage();
+      } else { throw new Error('API error'); }
+    } catch(err) {
+      console.error('Fetch error:',err);
+      showToast('⚠️ Failed to load — using cached data');
       if (btn) btn.textContent = '❌ Sync Failed';
-      loadFromLocalStorage(); cleanup();
-    }, 15000);
-    window[cbName] = function(result) {
-      clearTimeout(timeoutId);
-      try {
-        if (result && result.status === 'success') {
-          orders = []; archivedOrders = [];
-          (result.data || []).forEach(function(o) { normalizeOrder(o); if (o.archived) archivedOrders.push(o); else orders.push(o); });
-          renderOrders(); renderArchive();
-          if (btn) btn.textContent = '🔄 Refresh';
-          showToast('✓ Data loaded'); saveToLocalStorage();
-        } else { throw new Error('API error'); }
-      } catch (err) {
-        console.error('Parse error:', err);
-        showToast('⚠️ Failed to load — using cached data');
-        if (btn) btn.textContent = '❌ Sync Failed';
-        loadFromLocalStorage();
-      }
-      cleanup();
-  };
-  script = document.createElement('script');
-  script.src = API_URL + '?callback=' + cbName + '&t=' + Date.now();
-  script.onerror = function() {
-    clearTimeout(timeoutId);
-    showToast('⚠️ Failed to load — using cached data');
-    if (btn) btn.textContent = '❌ Sync Failed';
-    loadFromLocalStorage(); cleanup();
-  };
-  document.body.appendChild(script);
+      loadFromLocalStorage();
+    }
   }
 
   function loadFromLocalStorage() {

@@ -161,11 +161,64 @@
     .right-panel { padding: 1rem 1rem 2rem; }
     .order-summary { flex-direction: column; align-items: flex-start; padding: 12px 14px; gap: 12px; }
     .order-summary-dates { flex-wrap: wrap; gap: 12px; width: 100%; }
-    .order-summary-right { width: 100%; flex-wrap: wrap; justify-content: flex-start; padding-top: 10px; border-top: 1px dashed var(--border-strong); }
+    .order-summary-right { width: 100%; flex-wrap: wrap; justify-content: flex-start; padding-top: 10px; border-top: 1px dashed var(--border-strong); gap: 10px; }
     .detail-item { flex-direction: column; align-items: flex-start; padding: 12px 14px; gap: 8px; }
     .detail-fabric-meta { white-space: normal; line-height: 1.4; }
-    .detail-item-actions { width: 100%; justify-content: flex-start; margin-left: 0; flex-wrap: wrap; gap: 6px; }
+    .detail-item-actions { width: 100%; justify-content: flex-start; margin-left: 0; flex-wrap: wrap; gap: 8px; }
     .modal { width: 100%; margin: 10px; padding: 20px 16px; }
+
+    /* Prevent iOS Safari auto-zoom on focus — inputs/selects need >=16px font-size */
+    .ref-input, .modal-input, .search-input, .fabric-row input,
+    input[type="text"], input[type="date"], textarea, select {
+      font-size: 16px !important;
+    }
+
+    /* Keep the submit button reachable without scrolling the whole form */
+    .left-panel-footer {
+      position: sticky;
+      bottom: 0;
+      z-index: 20;
+      padding: 0.65rem 0 calc(0.5rem + env(safe-area-inset-bottom));
+      box-shadow: 0 -6px 16px rgba(0,0,0,0.07);
+    }
+
+    /* Bigger, easier-to-tap icon buttons */
+    .delete-btn, .edit-btn { width: 42px; height: 42px; font-size: 17px; }
+    .archive-btn, .restore-btn { height: 38px; padding: 0 12px; font-size: 12px; }
+    .status-btn { min-width: 0; height: 40px; padding: 0 14px; }
+    .fitted-dot { width: 22px; height: 22px; }
+    .tl-delete-btn { width: 20px; height: 20px; font-size: 11px; }
+    .remove-item-btn { width: 36px; height: 36px; }
+
+    /* Scroll filter rows horizontally instead of wrapping into many lines */
+    .filter-bar {
+      flex-wrap: nowrap;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+      padding-bottom: 2px;
+      margin-left: -1rem;
+      margin-right: -1rem;
+      padding-left: 1rem;
+      padding-right: 1rem;
+    }
+    .filter-bar::-webkit-scrollbar { display: none; }
+    .filter-bar .filter-label,
+    .filter-bar .sort-btn,
+    .filter-bar .filter-divider { flex-shrink: 0; }
+
+    /* Stack the date-range filter fields for easier tapping */
+    #date-filter-panel > div, #archive-date-filter-panel > div {
+      flex-direction: column;
+      align-items: stretch;
+    }
+    #date-filter-panel input[type="date"], #archive-date-filter-panel input[type="date"] {
+      width: 100%;
+      height: 44px;
+    }
+
+    .search-input { height: 46px; }
+    .tab-btn { height: 48px; padding: 0 22px; font-size: 15px; }
   }
 </style>
 </head>
@@ -407,7 +460,7 @@
 
 <script>
   // ── API ──
-  const API_URL = 'https://script.google.com/macros/s/AKfycbzXSXLyePqEwvop2Leir5Y0js7V7elvuJh4BQOFyl34zyer6m89p2rsEr01v5TAO8qh/exec';
+  const API_URL = 'https://script.google.com/macros/s/AKfycbwWuZBEvhFiwYu9YYEDnhFr2NRA1JPp3CvzC_NUTCp-nMAl7R5bVOCVjgqN8YWjTiYa/exec';
   // ── CONSTANTS ──
   var PRODUCTS     = ['Jacket','Trousers','Shirt','Vest','Safari Jacket','Overcoat'];
   var PRODUCT_IDS  = {'Jacket':'jacket','Trousers':'trousers','Shirt':'shirt','Vest':'vest','Safari Jacket':'safari','Overcoat':'overcoat'};

@@ -460,7 +460,7 @@
 
 <script>
   // ── API ──
-  const API_URL = 'https://script.google.com/macros/s/AKfycbwWuZBEvhFiwYu9YYEDnhFr2NRA1JPp3CvzC_NUTCp-nMAl7R5bVOCVjgqN8YWjTiYa/exec';
+  const API_URL = 'https://script.google.com/macros/s/AKfycbwZWtY4PJPmF69WmEPkWYwQdHVISV41-8A0dP6U0a4IcOi-t6Ml2MLT2V10QKv1g-yi/exec';
   // ── CONSTANTS ──
   var PRODUCTS     = ['Jacket','Trousers','Shirt','Vest','Safari Jacket','Overcoat'];
   var PRODUCT_IDS  = {'Jacket':'jacket','Trousers':'trousers','Shirt':'shirt','Vest':'vest','Safari Jacket':'safari','Overcoat':'overcoat'};
@@ -556,16 +556,35 @@
     o.dueDate     = parseToYMD(o.dueDate);
     o.fittingDate = parseToYMD(o.fittingDate);
     o.remarks     = typeof o.remarks === 'string' ? o.remarks : '';
-    o.fitted      = typeof o.fitted === 'number' ? o.fitted : 0;
+    o.fitted      = parseInt(o.fitted, 10) || 0;
     o.fittedDates = (o.fittedDates && typeof o.fittedDates === 'object') ? o.fittedDates : {};
     o.archived    = o.archived === true || o.archived === 'true';
     o.lastUpdated = o.lastUpdated || '';
+    o.baseVersion = o.lastUpdated;   // server version this copy is based on (conflict guard)
     return o;
   }
 
   // ── API SYNC ──
   var lastSyncTime = 0;
   var syncTimers = {}; // debounce timer per order
+  var pendingWrites = 0; // number of POSTs currently in flight
+
+  // True when there is unsent or unconfirmed work — refreshing now would lose it.
+  function hasPendingSync() {
+    return pendingWrites > 0 || Object.keys(syncTimers).length > 0;
+  }
+
+  // Fire every debounced save immediately. Called before the page is backgrounded,
+  // because mobile browsers suspend setTimeout in hidden tabs and the save is lost.
+  function flushPendingSyncs() {
+    Object.keys(syncTimers).forEach(function(key) {
+      clearTimeout(syncTimers[key]);
+      delete syncTimers[key];
+      var latest = orders.find(function(o){ return o.orderNum === key; })
+                || archivedOrders.find(function(o){ return o.orderNum === key; });
+      if (latest) _doSync(Object.assign({}, latest, {baseVersion: latest.baseVersion || ''}), false);
+    });
+  }
 
   function syncToServer(orderData, isDelete) {
     if (!orderData || !orderData.orderNum) { console.warn("syncToServer: invalid orderData", orderData); return; }
@@ -592,18 +611,48 @@
       var latest = orders.find(function(o){ return o.orderNum === key; })
                 || archivedOrders.find(function(o){ return o.orderNum === key; });
       if (!latest) return;
-      _doSync(Object.assign({}, latest, {lastUpdated: new Date().toISOString()}), false);
+      _doSync(Object.assign({}, latest, {baseVersion: latest.baseVersion || ''}), false);
     }, 1500);
   }
 
   async function _doSync(payload, isDelete) {
+    pendingWrites++;
     try {
       var r = await fetch(API_URL, {method:'POST', body:JSON.stringify(payload), headers:{'Content-Type':'text/plain;charset=utf-8'}, redirect:'follow'});
       var text = await r.text();
       var result = {};
-      try { result = JSON.parse(text); } catch(_) { result = {status: text.includes('success') ? 'success' : 'error'}; }
-      showToast(result.status==='success' ? (isDelete?'✓ Deleted':'✓ Saved') : '⚠️ Local save only (API error)');
-    } catch(err) { console.error('Sync error:',err); showToast('✓ Saved locally (offline)'); }
+      try { result = JSON.parse(text); } catch(_) { result = {status: text.indexOf('success') !== -1 ? 'success' : 'error'}; }
+
+      // Another device changed this order after we loaded it. Our copy is stale —
+      // the server refused it. Reload so we never silently overwrite newer data.
+      if (result.status === 'conflict') {
+        showToast('⚠️ Changed on another device — reloading');
+        await fetchOrdersFromServer();
+        return;   // the finally block still releases the in-flight counter
+      }
+
+      if (result.status === 'success') {
+        var t = orders.concat(archivedOrders).find(function(o){ return o.orderNum === payload.orderNum; });
+        var dateChanged = false;
+        if (t) {
+          if (result.lastUpdated) { t.lastUpdated = result.lastUpdated; t.baseVersion = result.lastUpdated; }
+          // The server owns the Ordered date. If it disagrees with what we showed
+          // optimistically (e.g. this device's clock is wrong), take the server's.
+          if (result.date && t.date !== result.date) { t.date = result.date; dateChanged = true; }
+        }
+        saveToLocalStorage();
+        if (dateChanged) renderOrders();
+        showToast(isDelete ? '✓ Deleted' : '✓ Saved');
+      } else {
+        // Never claim a save that did not happen.
+        showToast('⚠️ NOT saved — tap Refresh and try again');
+      }
+    } catch(err) {
+      console.error('Sync error:', err);
+      showToast('⚠️ NOT saved — no connection. Change is local only.');
+    } finally {
+      pendingWrites = Math.max(0, pendingWrites - 1);
+    }
   }
 
   async function fetchOrdersFromServer() {
@@ -658,13 +707,28 @@
     }, 3000);
   };
 
-  // Auto-refresh on focus — skip if user is actively searching OR recently saved (within 30s)
-  window.addEventListener('focus', function() {
-    var oS = document.getElementById('order-search'), aS = document.getElementById('archive-search');
-    if ((oS && oS.value.trim()) || (aS && aS.value.trim())) return;
-    if (Date.now() - lastSyncTime < 30000) return; // skip if saved within last 30 seconds
+  // Auto-refresh. The only thing that may block a refresh is unsent work of our own —
+  // a stale device is exactly what causes old data to be uploaded over new data.
+  // (The search box no longer blocks it; renderOrders() re-applies the search term.)
+  function maybeRefresh() {
+    if (document.visibilityState !== 'visible') return;
+    if (hasPendingSync()) return;
+    if (Date.now() - lastSyncTime < 30000) return;
     fetchOrdersFromServer();
+  }
+
+  window.addEventListener('focus', maybeRefresh);
+
+  document.addEventListener('visibilitychange', function() {
+    if (document.visibilityState === 'hidden') {
+      flushPendingSyncs();   // don't let a backgrounded tab swallow a pending save
+    } else {
+      maybeRefresh();
+    }
   });
+
+  // Belt and braces: a tab left open all day still picks up other devices' changes.
+  setInterval(maybeRefresh, 60000);
 
   // ── TABS ──
   function switchTab(tab) {
